@@ -25,6 +25,9 @@ const chooseView = (view) => {
     if (active) button.setAttribute('aria-current', 'page'); else button.removeAttribute('aria-current');
   });
   if (view === 'saved') renderSaved();
+  // The panels share one scroll container; reveal the top of each newly opened panel.
+  const sidebarScroll = document.querySelector('.sidebar-scroll');
+  if (sidebarScroll) sidebarScroll.scrollTop = 0;
   state.map?.resize();
 };
 document.querySelectorAll('[data-view]').forEach((button) => button.addEventListener('click', () => chooseView(button.dataset.view)));
@@ -130,7 +133,7 @@ async function loadMap() {
     state.map.on('error', () => status('Some map tiles may be unavailable. Check the selected map provider.'));
     el('map-consent').hidden = true;
     el('map-mode').textContent = 'Interactive map · ' + state.config.provider;
-    for (const id of ['zoom-in','zoom-out','reset-view']) el(id).disabled = false;
+    for (const id of ['zoom-in','zoom-out','reset-view','pin-center']) el(id).disabled = false;
   } catch (error) {
     state.map?.remove(); state.map = null;
     status('Unable to start map rendering on this device.');
@@ -140,12 +143,17 @@ el('load-map').addEventListener('click', loadMap);
 el('zoom-in').addEventListener('click', () => state.map?.zoomIn());
 el('zoom-out').addEventListener('click', () => state.map?.zoomOut());
 el('reset-view').addEventListener('click', () => state.map?.flyTo({center: WORLD_CENTER, zoom: 3.6}));
+el('pin-center').addEventListener('click', () => {
+  if (!state.map) return;
+  const center = state.map.getCenter();
+  selectPoint([center.lng, center.lat], 'Map center');
+});
 el('reload-tiles').addEventListener('click', () => {
   state.map?.remove(); state.map = null;
   state.markerStart = null; state.markerEnd = null;
   el('map-consent').hidden = false;
   el('map-mode').textContent = 'Map not loaded';
-  for (const id of ['zoom-in','zoom-out','reset-view']) el(id).disabled = true;
+  for (const id of ['zoom-in','zoom-out','reset-view','pin-center']) el(id).disabled = true;
   chooseView('privacy');
   status('Map requests stopped. Previously sent requests cannot be recalled.');
 });
