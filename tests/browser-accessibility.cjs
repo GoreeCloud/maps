@@ -28,6 +28,30 @@ async function journey(browser, base, name, width, height, contrast) {
   try {
     await page.goto(base,{waitUntil:'networkidle'});
     assert.equal(await page.locator('#map-consent').isVisible(),true);
+    // Verify that the verified GC UI Foundations CSS is the actual rendered source
+    // in both themes, not an inert dependency or a duplicated local color palette.
+    const gcColors=async()=>page.evaluate(()=>{
+      const root=document.documentElement;
+      const probe=document.createElement('i');
+      probe.style.backgroundColor='var(--gc-v1-color-canvas)';
+      document.body.append(probe);
+      const tokenColor=getComputedStyle(probe).backgroundColor;
+      probe.remove();
+      return {mode:root.dataset.gcMode,accent:root.dataset.gcAccent,
+        actual:getComputedStyle(document.body).backgroundColor,token:tokenColor};
+    });
+    let colors=await gcColors();
+    assert.equal(colors.mode,'dark');
+    assert.equal(colors.accent,'lagoon');
+    assert.equal(colors.actual,colors.token,'dark mode must consume GC UI canvas tokens');
+    await page.locator('#theme-toggle').click();
+    const light=await gcColors();
+    assert.equal(light.mode,'light');
+    assert.equal(light.actual,light.token,'light mode must consume GC UI canvas tokens');
+    assert.notEqual(light.actual,colors.actual,'theme mode must change real surface colors');
+    await page.locator('#theme-toggle').click();
+    colors=await gcColors();
+    assert.equal(colors.mode,'dark');
     assert.equal(await page.evaluate(() => matchMedia('(forced-colors: active)').matches),contrast);
     await page.screenshot({path:resolve(evidence,name+'-consent-before-scroll.png')});
     // The consent link must remain reachable inside the map region, including at phone size.

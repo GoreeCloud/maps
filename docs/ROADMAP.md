@@ -7,7 +7,7 @@ All items below are **planned**, not current product capabilities.
 - Build on passing synthetic viewport/keyboard/forced-colors, narrow-width CSS reflow, and isolated **genuine Chromium 200–400% browser zoom** tests with real phones/tablets, manual zoom in Chromium/Firefox/Safari, keyboard-only traversal, screen-reader testing, broader visual states, and comprehensive GoreeCloud UI design acceptance. Reviewed synthetic screenshots are scoped evidence, not production UI approval.
 - Extend implemented keyboard map-center pin tests to map navigation and keyboard-only point changes; verify real tile-provider attribution, cookie/privacy exposure, CSP and Referrer-Policy with licensed production infrastructure.
 - Connect authorized own-hosted map tiles, Nominatim and OSRM; verify service capacity, data freshness, licensing, alerts and observability.
-- Integrate approved GoreeCloud UI tokens/components and document five-platform MIPS assessment.
+- Complete the approved GoreeCloud UI **component/layout** adoption, accessible visual QA and five-platform MIPS assessment; scoped stable Foundations color/typography token integration has begun, but is not full design-system acceptance.
 - Trusted HTTPS gateway, request budgets, structured privacy-safe errors and operations runbook.
 - Profile map renderer performance and network consumption on real mobile devices; synthetic CI checks that the map code bundle is not fetched before the consent action.
 

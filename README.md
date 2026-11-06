@@ -13,7 +13,7 @@ Privacy-first maps and navigation **development preview**. This repository is an
 - Local saved-place changes are applied to the UI only after browser-storage writes succeed; failed persistence is reported instead of silently pretending success. Browser/device acceptance pending.
 - Optional place search through a configured Nominatim-compatible upstream and driving routes through a configured OSRM-compatible upstream.
 - Same-origin Node proxy using bounded JSON POST inputs for private search/route requests, provider reply limits, and no storage of search queries or route coordinates.
-- Accessible, rounded and floating GoreeCloud UI-inspired controls, with light/dark appearance.
+- Accessible, rounded and floating controls using the **verified GoreeCloud UI Foundations 1.0.1 semantic color/typography tokens** (pinned release tarball, checksum-verified) with light/dark appearance and a curated Lagoon accent. Full component migration and GC UI visual acceptance remain pending.
 - Node tests, GitHub Actions security/build checks, three-viewport Chromium journeys, keyboard/forced-colors checks, synthetic narrow-width reflow, and isolated **genuine Chromium 200%/400% zoom** with measured DPR and scroll reachability. Screen-reader, other-engine, real-device and holistic visual acceptance remain pending; native-zoom virtual-GPU screenshots can be incomplete.
 - A keyboard-operable "Pin map center" control can select the visible map position without pointer input.
 
@@ -21,7 +21,7 @@ No real-time traffic, turn-by-turn voice guidance, offline tile downloads, satel
 
 ## Local development
 
-Requires Node 22+. Review dependencies and their licenses before installation.
+Requires Node 22+. Review dependencies and their licenses before installation. The Apache-2.0 [GC UI Foundations 1.0.1 release](https://github.com/GoreeCloud/gc-ui/releases/tag/foundations-v1.0.1) is installed from its exact public GitHub archive, not assumed available through the npm registry. Its recorded SHA-256 is `275d7e6dc9503b2e74b3190bcecf176d73d2345860e8a20fa5faa3b326cd2298`, verified against the downloaded archive before adoption. Foundations includes only the scoped token/color/theme contract, not experimental GC UI components.
 
 1. Run `npm ci` to install the verified dependency versions from the committed `package-lock.json`. Review package sources, code and licenses before installation.
 2. Copy `.env.example` to `.env`, or supply the optional server environment variables through your shell.
