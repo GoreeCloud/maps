@@ -129,7 +129,7 @@ async function loadMap() {
     state.map.on('moveend', () => {
       el('map-coordinates').textContent = formatPoint([state.map.getCenter().lng, state.map.getCenter().lat]);
     });
-    state.map.on('load', () => status('Ready. Tap or click anywhere to select a destination.'));
+    state.map.on('load', () => { if (!state.selection) status('Ready. Tap or click anywhere to select a destination.'); });
     state.map.on('error', () => status('Some map tiles may be unavailable. Check the selected map provider.'));
     el('map-consent').hidden = true;
     el('map-mode').textContent = 'Interactive map · ' + state.config.provider;
