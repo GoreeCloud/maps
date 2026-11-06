@@ -2,7 +2,7 @@ import { Map, Marker, LngLatBounds, setWorkerUrl } from 'maplibre-gl';
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './style.css';
-import { WORLD_CENTER, validPoint, formatPoint, cleanLabel, readSaved, formatDuration, formatDistance } from './lib/geo.js';
+import { WORLD_CENTER, validPoint, parsePoint, formatPoint, cleanLabel, readSaved, formatDuration, formatDistance } from './lib/geo.js';
 
 setWorkerUrl(workerUrl);
 const el = (id) => document.getElementById(id);
@@ -217,8 +217,15 @@ el('route-button').addEventListener('click', async () => {
 
 el('search-form').addEventListener('submit', async (event) => {
   event.preventDefault();
-  if (!state.config?.search) { status('Search requires an operator-configured geocoder.'); return; }
   const query = el('search-input').value.trim();
+  const directPoint = parsePoint(query);
+  if (directPoint) {
+    selectPoint(directPoint, 'Coordinates ' + formatPoint(directPoint));
+    if (state.map) state.map.flyTo({center: directPoint, zoom: 13});
+    el('search-results').textContent = 'Coordinate located locally. No geocoding request sent.';
+    return;
+  }
+  if (!state.config?.search) { status('Place search requires an operator-configured geocoder. Coordinates work without one.'); return; }
   if (query.length < 2) { status('Search for at least two characters.'); return; }
   const list = el('search-results'); list.textContent = 'Searching…';
   try {
@@ -250,7 +257,7 @@ async function loadConfig() {
     const data = await response.json();
     if (!data.tileUrl || !data.attribution) throw new Error('Incomplete map configuration.');
     state.config = data;
-    el('search-hint').textContent = data.search ? 'Search is sent through your configured geocoder.' : 'Search requires your configured geocoding service.';
+    el('search-hint').textContent = data.search ? 'Coordinate searches are local. Place names use your configured geocoder.' : 'Enter longitude,latitude to look up coordinates locally. Place names require a configured geocoder.';
     if (!data.routing) el('route-summary').textContent = 'Routing is disabled until an operator configures OSRM.';
   } catch {
     status('The GoreeCloud Maps API is offline. Start the API service and reload.');
