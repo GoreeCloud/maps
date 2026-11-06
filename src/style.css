@@ -132,7 +132,8 @@ h1 em{font-style:normal;color:var(--primary)}
   .app-nav{bottom:max(12px,env(safe-area-inset-bottom));width:calc(100% - 22px);justify-content:space-between;padding:5px;border-radius:22px}
   .nav-item{flex:1;font-size:12px;padding:8px 5px;min-height:46px;gap:4px}
   .nav-item span{font-size:17px}
-  .map-topline{top:12px;left:12px}
+  .map-topline{top:12px;left:12px;max-width:calc(100% - 100px);overflow:hidden;white-space:nowrap}
+  .map-topline #map-mode{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .map-controls{right:12px;top:12px}
   .map-bottom{left:12px;right:12px;bottom:12px}
   .map-bottom span{font-size:10px}
