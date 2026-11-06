@@ -4,7 +4,7 @@ Privacy-first maps and navigation **development preview**. This repository is an
 
 ## What is available in this preview
 
-- Responsive MapLibre-based interactive map with OpenStreetMap raster tiles after explicit user consent.
+- Responsive MapLibre-based interactive map with OpenStreetMap raster tiles after explicit user consent; the renderer's JavaScript is loaded lazily only when requested.
 - Explicit, permission-based browser geolocation; select points by clicking the map.
 - Local longitude,latitude coordinate lookup without any geocoding provider request.
 - Local-only saved places, browser-only preference, and erase-all control.

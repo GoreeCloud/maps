@@ -68,6 +68,10 @@ async function runProfile(browser, base, profile) {
     await page.locator('#search-hint').filter({hasText:'configured geocoder'}).waitFor();
     assert.equal(await page.locator('#map-consent').isVisible(), true,
       'map should require an explicit loading action');
+    const preConsentMapChunk = await page.evaluate(() =>
+      performance.getEntriesByType('resource').some((entry) =>
+        /\/assets\/maplibre-gl-[^/]+\.js(?:\?|$)/.test(entry.name)));
+    assert.equal(preConsentMapChunk, false, 'map engine JavaScript must not load before consent');
     await page.screenshot({path:resolve(evidence,profile.name+'-consent.png')});
 
     await page.locator('#search-input').fill('-86.801,33.518');
@@ -138,7 +142,17 @@ async function runProfile(browser, base, profile) {
     await page.locator('#load-map').click();
     await page.locator('#map-consent').waitFor({state:'hidden', timeout:15000});
     await page.locator('.maplibregl-canvas').waitFor({state:'visible', timeout:15000});
+    const afterConsentMapChunk = await page.evaluate(() =>
+      performance.getEntriesByType('resource').some((entry) =>
+        /\/assets\/maplibre-gl-[^/]+\.js(?:\?|$)/.test(entry.name)));
+    assert.equal(afterConsentMapChunk, true, 'map engine JavaScript should load after consent');
     await page.screenshot({path:resolve(evidence,profile.name+'-map.png')});
+    await page.locator('[data-view="privacy"]').click();
+    await page.locator('#reload-tiles').click();
+    assert.equal(await page.locator('#map-consent').isVisible(), true,
+      'revoking map access must restore the consent surface');
+    assert.equal(await page.locator('#pin-center').isDisabled(), true,
+      'map controls must be disabled after map access is withdrawn');
     assert.deepEqual(unintendedExternal,[], 'unexpected external browser fetch');
     assert.deepEqual(errors,[], 'uncaught frontend exceptions');
     console.log('PASS',profile.name,'synthetic browser journey');

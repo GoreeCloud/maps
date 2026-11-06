@@ -9,6 +9,7 @@ All items below are **planned**, not current product capabilities.
 - Connect authorized own-hosted map tiles, Nominatim and OSRM; verify service capacity, data freshness, licensing, alerts and observability.
 - Integrate approved GoreeCloud UI tokens/components and document five-platform MIPS assessment.
 - Trusted HTTPS gateway, request budgets, structured privacy-safe errors and operations runbook.
+- Profile map renderer performance and network consumption on real mobile devices; synthetic CI checks that the map code bundle is not fetched before the consent action.
 
 ## P1 — Useful travel features
 - Richer geocoding, reverse geocoding, POI details, saved route plans, GPX, and richer GeoJSON geometry compatibility.
