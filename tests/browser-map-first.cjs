@@ -49,7 +49,14 @@ function inViewport(r,width,label){
         inViewport(sheet,width,name+' floating tools');
         if(width<=700){
           assert.ok(sheet.width<width-14,name+': bottom sheet should leave side margins');
-          assert.ok(sheet.y>height*.47,name+': bottom sheet should leave the top map exposed');
+          assert.ok(sheet.y>height*.62,name+': collapsed bottom sheet should expose the majority of the map');
+          const toggle=page.locator('#sheet-toggle');
+          assert.equal(await toggle.isVisible(),true);
+          assert.equal(await toggle.getAttribute('aria-expanded'),'false');
+          await toggle.click();
+          assert.equal(await toggle.getAttribute('aria-expanded'),'true');
+          await toggle.click();
+          assert.equal(await toggle.getAttribute('aria-expanded'),'false');
         }else{
           assert.ok(sheet.width<=375,name+': floating sidebar must not dominate map canvas');
         }
@@ -65,8 +72,13 @@ function inViewport(r,width,label){
           assert.ok(card.x>=sheet.x+sheet.width-8,
             name+': desktop map consent must not obstruct the sidebar');
         }
-        assert.equal(await page.locator('#map-preview-note').isVisible(),true,
-          'Offline street illustration must be explicitly labeled');
+        if(width<=700) {
+          assert.equal(await page.locator('#map-preview-note').isVisible(),false);
+          assert.match(await page.locator('.consent-title small').textContent(),/ILLUSTRATIVE/);
+        } else {
+          assert.equal(await page.locator('#map-preview-note').isVisible(),true,
+            'Offline street illustration must be explicitly labeled');
+        }
         const bg=await page.locator('#map').evaluate(el=>getComputedStyle(el).backgroundImage);
         assert.match(bg,/map-preview[.]svg/,'visible pre-consent background must be the local street illustration');
         assert.deepEqual(external,[],name+': must not contact tile provider before explicit consent');
@@ -91,8 +103,9 @@ function inViewport(r,width,label){
           assert.equal(liveBg,'none','Illustrative background must disappear when the live map loads');
           await page.locator('[data-view="privacy"]').click();
           await page.locator('#reload-tiles').click();
-          assert.equal(await page.locator('#map-preview-note').isVisible(),true);
+          assert.equal(await page.locator('#map-preview-note').isVisible(),false);
           assert.equal(await page.locator('#map-consent').isVisible(),true);
+          assert.match(await page.locator('.consent-title small').textContent(),/ILLUSTRATIVE/);
         }
         assert.deepEqual(errors,[],name+' JavaScript errors');
         console.log('PASS map-first '+name+' '+width+'x'+height);
