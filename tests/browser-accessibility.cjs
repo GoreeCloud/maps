@@ -48,7 +48,10 @@ async function journey(browser, base, name, width, height, contrast) {
     const light=await gcColors();
     assert.equal(light.mode,'light');
     assert.equal(light.actual,light.token,'light mode must consume GC UI canvas tokens');
-    assert.notEqual(light.actual,colors.actual,'theme mode must change real surface colors');
+    // In forced-colors, Chromium intentionally substitutes system Canvas colors,
+    // so the rendered colors need not differ even when the chosen theme changes.
+    if (!contrast) assert.notEqual(light.actual,colors.actual,
+      'theme mode must change real surface colors');
     await page.locator('#theme-toggle').click();
     colors=await gcColors();
     assert.equal(colors.mode,'dark');
