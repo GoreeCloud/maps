@@ -162,6 +162,7 @@ h1 em{font-style:normal;color:var(--primary)}
 /* Local saved-place portability and manual route coordinates. */
 .saved-tools{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .saved-tools .secondary-action{margin-top:0}
+.saved-tools #export-gpx{grid-column:1/-1}
 .coordinate-entry{margin-top:16px;padding:16px;border-radius:20px;border:1px solid var(--outline);background:var(--surface-raised);display:flex;flex-direction:column;gap:7px}
 .coordinate-entry label{color:var(--muted);font-size:13px;font-weight:650}
 .coordinate-entry input{width:100%;color:var(--on);background:var(--input);border:1px solid var(--outline);border-radius:12px;min-height:44px;padding:10px 12px}

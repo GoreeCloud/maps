@@ -2,6 +2,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import './style.css';
 import { WORLD_CENTER, validPoint, parsePoint, formatPoint, cleanLabel, readSaved, formatDuration, formatDistance } from './lib/geo.js';
 import { exportSavedGeoJSON, importSavedGeoJSON, mergeSavedPlaces, MAX_IMPORT_BYTES } from './lib/geojson.js';
+import { exportSavedGPX } from './lib/gpx.js';
 import { createRouteRequestGuard } from './lib/route-request.js';
 import { createSafeStore } from './lib/storage.js';
 
@@ -209,6 +210,7 @@ el('save-selection').addEventListener('click', () => {
 function renderSaved() {
   const list = el('saved-list'); list.replaceChildren();
   el('export-places').disabled = state.saved.length === 0;
+  el('export-gpx').disabled = state.saved.length === 0;
   if (!state.saved.length) {
     const empty = document.createElement('p'); empty.className = 'empty-message';
     empty.textContent = 'Nothing saved yet. Choose a point on the map, then save it.';
@@ -254,6 +256,23 @@ el('export-places').addEventListener('click', () => {
     status('Saved-place backup created locally. Keep this file private.');
   } catch (error) {
     status(error.message || 'Could not export saved places.');
+  }
+});
+el('export-gpx').addEventListener('click', () => {
+  if (!state.saved.length) return;
+  try {
+    const data = exportSavedGPX(state.saved);
+    const blob = new Blob([data], {type:'application/gpx+xml'});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'goreecloud-maps-saved-waypoints.gpx';
+    document.body.append(link);
+    try { link.click(); } finally { link.remove(); }
+    setTimeout(() => URL.revokeObjectURL(url), 3000);
+    status('GPX waypoint file created locally. Keep location exports private.');
+  } catch (error) {
+    status(error.message || 'Could not export GPX waypoints.');
   }
 });
 el('import-places-button').addEventListener('click', () => el('import-places').click());
