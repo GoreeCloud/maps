@@ -26,12 +26,20 @@ async function loadMapEngine() {
 const el = (id) => document.getElementById(id);
 const SAVE_KEY = 'goreecloud.maps.saved.v1';
 const THEME_KEY = 'goreecloud.maps.theme.v1';
-const state = { map: null, engine: null, mapLoading: false, mapRequestId: 0, start: null, end: null, selection: null, pick: 'end', markerStart: null, markerEnd: null, saved: [], config: null };
+const state = { map: null, engine: null, mapLoading: false, mapRequestId: 0, start: null, end: null, selection: null, pick: 'end', markerStart: null, markerEnd: null, saved: [], config: null, geoRequestId: 0, startSource: null };
 const routeGuard = createRouteRequestGuard();
 const safeStore = createSafeStore();
 state.saved = readSaved(safeStore.get(SAVE_KEY));
 const status = (message) => { el('status').textContent = message; };
 const hasMap = () => { if (state.map) return true; status('Load the map before choosing a point.'); return false; };
+// Browser geolocation permission prompts cannot be cancelled. Instead, invalidate the
+// callback's epoch whenever the user changes the start or withdraws map consent.
+function cancelPendingDeviceLocation() {
+  state.geoRequestId += 1;
+  const button = el('use-location');
+  button.disabled = false;
+  button.removeAttribute('aria-busy');
+}
 const chooseView = (view) => {
   document.querySelectorAll('[data-panel]').forEach((panel) => { panel.hidden = panel.dataset.panel !== view; });
   document.querySelectorAll('[data-view]').forEach((button) => {
@@ -99,6 +107,10 @@ function selectPoint(point, label) {
   renderSelection();
   if (document.querySelector('[data-panel="route"]').hidden === false) {
     const which = state.pick;
+    if (which === 'start') {
+      cancelPendingDeviceLocation();
+      state.startSource = 'manual';
+    }
     state[which] = [...point];
     invalidateRoute();
     el(which === 'start' ? 'start-label' : 'end-label').textContent = title;
@@ -182,8 +194,16 @@ el('pin-center').addEventListener('click', () => {
   selectPoint([center.lng, center.lat], 'Map center');
 });
 el('reload-tiles').addEventListener('click', () => {
-  // Invalidate an asynchronous map load so it cannot reopen tiles after revocation.
+  // Invalidate pending map loads AND browser geolocation callbacks. The OS-level
+  // permission prompt might still resolve, but its callback must have no effect.
   state.mapRequestId += 1;
+  cancelPendingDeviceLocation();
+  if (state.startSource === 'device') {
+    state.start = null;
+    state.startSource = null;
+    el('start-label').textContent = 'Choose on map';
+  }
+  invalidateRoute();
   state.map?.remove(); state.map = null;
   state.markerStart = null; state.markerEnd = null;
   el('map-consent').hidden = false;
@@ -314,7 +334,9 @@ el('apply-route-coordinates').addEventListener('click', () => {
   const end = parsePoint(el('end-coordinates').value);
   if (!start || !end) { status('Enter valid longitude,latitude coordinates for both points.'); return; }
   if (start[0] === end[0] && start[1] === end[1]) { status('Start and destination must differ.'); return; }
+  cancelPendingDeviceLocation();
   state.start = start;
+  state.startSource = 'manual';
   state.end = end;
   el('start-label').textContent = formatPoint(start);
   el('end-label').textContent = formatPoint(end);
@@ -326,20 +348,52 @@ el('apply-route-coordinates').addEventListener('click', () => {
   el('route-summary').textContent = 'Points set. Find driving route to calculate a new route.';
   status('Start and destination set locally, without device location.');
 });
-el('choose-start').addEventListener('click', () => { state.pick = 'start'; status('Tap the map to choose your starting point.'); });
+el('choose-start').addEventListener('click', () => {
+  cancelPendingDeviceLocation();
+  state.pick = 'start';
+  status('Tap the map to choose your starting point.');
+});
 el('choose-end').addEventListener('click', () => { state.pick = 'end'; status('Tap the map to choose your destination.'); });
 el('use-location').addEventListener('click', () => {
   if (!hasMap()) return;
   if (!navigator.geolocation) { status('Geolocation is not available in this browser.'); return; }
+  const button = el('use-location');
+  const token = ++state.geoRequestId;
+  const mapToken = state.mapRequestId;
+  const requestedMap = state.map;
+  const active = () => token === state.geoRequestId &&
+    mapToken === state.mapRequestId && state.map === requestedMap && !!state.map;
+  const finish = () => { button.disabled = false; button.removeAttribute('aria-busy'); };
+  button.disabled = true;
+  button.setAttribute('aria-busy', 'true');
   status('Requesting location permission from your browser…');
-  navigator.geolocation.getCurrentPosition(({coords}) => {
-    state.start = [coords.longitude, coords.latitude]; state.pick = 'end';
-    invalidateRoute();
-    el('start-label').textContent = 'My current location (this session)';
-    setMarker('start', state.start);
-    state.map.flyTo({center: state.start, zoom: 13});
-    status('Location available for this session. Choose a destination.');
-  }, () => status('Location unavailable or permission declined. Select a starting point on the map.'), {enableHighAccuracy: false, timeout: 12000, maximumAge: 0});
+  try {
+    navigator.geolocation.getCurrentPosition(({coords}) => {
+      if (!active()) return;
+      finish();
+      const point = [coords.longitude, coords.latitude];
+      if (!validPoint(point)) {
+        status('Location unavailable. Select a valid starting point on the map.');
+        return;
+      }
+      state.start = point;
+      state.startSource = 'device';
+      state.pick = 'end';
+      invalidateRoute();
+      el('start-label').textContent = 'My current location (this session)';
+      setMarker('start', point);
+      requestedMap.flyTo({center:point, zoom:13});
+      status('Location available for this session. Choose a destination.');
+    }, () => {
+      if (!active()) return;
+      finish();
+      status('Location unavailable or permission declined. Select a starting point on the map.');
+    }, {enableHighAccuracy:false, timeout:12000, maximumAge:0});
+  } catch {
+    if (!active()) return;
+    finish();
+    status('Location request failed. Select a starting point on the map.');
+  }
 });
 
 el('route-button').addEventListener('click', async () => {
