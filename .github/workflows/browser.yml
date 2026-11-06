@@ -27,6 +27,10 @@ jobs:
         env:
           MAPS_BROWSER_EVIDENCE: browser-evidence
         run: node tests/browser-review.cjs
+      - name: Verify keyboard, mobile layout and high-contrast interactions
+        env:
+          MAPS_BROWSER_EVIDENCE: browser-evidence
+        run: node tests/browser-accessibility.cjs
       - name: Preserve test screenshots
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
