@@ -9,7 +9,8 @@ Privacy-first maps and navigation **development preview**. This repository is an
 - Local longitude,latitude coordinate lookup without any geocoding provider request.
 - Local-only saved places, browser-only preference, and erase-all control.
 - Saved-place GeoJSON import/export (local file only), with validation and duplicate-aware merging; accessible start/end coordinate entry.
-- Route requests are invalidated when endpoints change, preventing outdated directions from being displayed as current. Browser/device acceptance pending.
+- Route requests are invalidated when endpoints change, preventing outdated directions from being displayed as current.
+- Local saved-place changes are applied to the UI only after browser-storage writes succeed; failed persistence is reported instead of silently pretending success. Browser/device acceptance pending.
 - Optional place search through a configured Nominatim-compatible upstream and driving routes through a configured OSRM-compatible upstream.
 - Same-origin Node proxy using bounded JSON POST inputs for private search/route requests, provider reply limits, and no storage of search queries or route coordinates.
 - Accessible, rounded and floating GoreeCloud UI-inspired controls, with light/dark appearance.

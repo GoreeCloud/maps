@@ -30,6 +30,9 @@ const fakeProvider = async (url) => {
     ]), {headers:{'Content-Type':'application/json'}});
   }
   if (path.includes('/route/v1/driving/')) {
+    if (path.includes('-87.2,33.7')) {
+      await new Promise((done) => setTimeout(done, 900));
+    }
     return new Response(JSON.stringify({
       code:'Ok',
       routes:[{geometry:{coordinates:[[-86.801,33.518],[-86.9,33.6]]},distance:16000,duration:1200}]
@@ -103,6 +106,18 @@ async function runProfile(browser, base, profile) {
     await page.locator('#route-button').click();
     await page.locator('#route-summary').filter({hasText:'20 min'}).waitFor();
     await page.screenshot({path:resolve(evidence,profile.name+'-route.png')});
+
+    // A late response from an obsolete route must never restore old directions.
+    await page.locator('#end-coordinates').fill('-87.2,33.7');
+    await page.locator('#apply-route-coordinates').click();
+    assert.doesNotMatch(await page.locator('#route-summary').innerText(), /20 min/);
+    await page.locator('#route-button').click();
+    await page.locator('#route-summary').filter({hasText:'Calculating driving route'}).waitFor();
+    await page.locator('#end-coordinates').fill('-86.7,33.4');
+    await page.locator('#apply-route-coordinates').click();
+    await page.waitForFunction(() => !document.querySelector('#route-button').disabled);
+    assert.match(await page.locator('#route-summary').innerText(), /Points set/);
+    assert.doesNotMatch(await page.locator('#route-summary').innerText(), /20 min/);
 
     await page.locator('[data-view="explore"]').click();
     await page.locator('#search-input').fill('library');
