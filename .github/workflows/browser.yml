@@ -28,6 +28,10 @@ jobs:
         env:
           MAPS_BROWSER_EVIDENCE: browser-evidence
         run: node tests/browser-review.cjs
+      - name: Verify map-first composition and privacy-first visual preview
+        env:
+          MAPS_BROWSER_EVIDENCE: browser-evidence
+        run: node tests/browser-map-first.cjs
       - name: Verify device-location callback revocation safety
         env:
           MAPS_BROWSER_EVIDENCE: browser-evidence

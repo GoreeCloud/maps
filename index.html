@@ -11,6 +11,11 @@
 <div id="app">
 <header class="app-header" aria-label="Application header">
 <a class="brand" href="/" aria-label="GoreeCloud Maps home"><span class="brand-mark" aria-hidden="true">◇</span><span><strong>GoreeCloud</strong><small>MAPS</small></span></a>
+<form id="search-form" class="search-form" role="search">
+<label class="sr-only" for="search-input">Search for a place</label>
+<input id="search-input" type="search" autocomplete="off" maxlength="120" placeholder="Place or longitude,latitude…" required>
+<button class="search-submit" type="submit" aria-label="Search">⌕</button>
+</form>
 <span class="preview-tag">Development preview</span>
 <button class="icon-button theme-toggle" type="button" id="theme-toggle" aria-label="Toggle dark and light appearance" title="Appearance">◐</button>
 </header>
@@ -21,17 +26,16 @@
 <button class="nav-item" type="button" data-view="privacy"><span aria-hidden="true">☷</span> Privacy</button>
 </nav>
 <main class="workspace">
-<section class="sidebar" aria-label="Map tools">
-<div class="sidebar-scroll">
+<section class="sidebar" aria-label="Map tools" data-active-view="explore">
+<button class="sheet-toggle" id="sheet-toggle" type="button" aria-expanded="false" aria-controls="sidebar-scroll">
+<span class="sheet-grip" aria-hidden="true"></span><span id="sheet-toggle-label">Show map tools</span><span class="sheet-toggle-chevron" aria-hidden="true">⌃</span>
+</button>
+<div class="sidebar-scroll" id="sidebar-scroll">
 <div class="view" data-panel="explore">
-<p class="eyebrow">EXPLORE THE WORLD</p>
-<h1>Every journey<br><em>starts somewhere.</em></h1>
-<p class="lead">Search for places, explore the map and keep the spots that matter to you.</p>
-<form id="search-form" class="search-form" role="search">
-<label class="sr-only" for="search-input">Search for a place</label>
-<input id="search-input" type="search" autocomplete="off" maxlength="120" placeholder="Place or longitude,latitude…" required>
-<button class="search-submit" type="submit" aria-label="Search">⌕</button>
-</form>
+<p class="eyebrow">EXPLORE</p>
+<h1>Find your next stop.</h1>
+<p class="lead">Choose a point on the map, or enter coordinates in search.</p>
+
 <p class="help" id="search-hint">Coordinate lookup works locally; place search needs a geocoder.</p>
 <div id="search-results" class="results" aria-live="polite"></div>
 <div class="section-title"><span>On the map</span><span class="muted">Choose any point</span></div>
@@ -39,7 +43,7 @@
 <button id="save-selection" class="secondary-action" type="button" disabled>♡ Save selected place</button>
 </div>
 <div class="view" data-panel="route" hidden>
-<p class="eyebrow">YOUR NEXT MOVE</p><h1>Make room<br><em>for discovery.</em></h1>
+<p class="eyebrow">DIRECTIONS</p><h1>Plan a route</h1>
 <p class="lead">Choose start and destination points on the map. Routing is available when an OSRM-compatible service is configured.</p>
 <div class="route-steps">
 <button id="choose-start" class="point-button" type="button"><span class="point-icon origin" aria-hidden="true">○</span><span><small>START</small><strong id="start-label">Choose on map</strong></span></button>
@@ -58,7 +62,7 @@
 <div id="route-summary" class="route-summary" aria-live="polite"></div>
 </div>
 <div class="view" data-panel="saved" hidden>
-<p class="eyebrow">YOUR COLLECTION</p><h1>Places worth<br><em>keeping close.</em></h1>
+<p class="eyebrow">YOUR PLACES</p><h1>Saved locations</h1>
 <p class="lead">Saved places stay in this browser, not in a GoreeCloud account.</p>
 <div class="saved-tools">
 <button id="export-places" class="secondary-action" type="button">Export GeoJSON</button>
@@ -70,7 +74,7 @@
 <div id="saved-list" class="results" aria-live="polite"></div>
 </div>
 <div class="view" data-panel="privacy" hidden>
-<p class="eyebrow">BUILT WITH INTENTION</p><h1>Your location.<br><em>Your decision.</em></h1>
+<p class="eyebrow">PRIVACY CONTROLS</p><h1>On your terms</h1>
 <p class="lead">No account, analytics, ads, or automatic device-location requests in this preview.</p>
 <div class="privacy-list">
 <div><strong>Map tile requests</strong><p>Loading the map contacts the selected tile provider. It can observe your IP address, the website origin (Referer), and the map area you view.</p></div>
@@ -86,14 +90,13 @@
 </section>
 <section class="map-area" aria-label="Interactive map">
 <div id="map" role="application" aria-label="Interactive geographic map"></div>
+<div id="map-preview-note" class="map-preview-note" aria-hidden="true">Illustrative preview · no live tiles loaded</div>
 <div id="map-consent" class="map-consent">
 <div class="consent-card">
-<div class="hero-symbol" aria-hidden="true">◇</div>
-<p class="eyebrow">THE WORLD, ON YOUR TERMS</p>
-<h2>Explore with clarity.</h2>
-<p>Maps use external map tiles. The tile provider receives your IP address, the website origin (Referer), and the geographic area you view. No device location permission is requested automatically.</p>
-<button id="load-map" class="primary-action" type="button">Load interactive map <span aria-hidden="true">↗</span></button>
-<a href="https://www.openstreetmap.org/copyright" rel="noopener noreferrer" target="_blank">About OpenStreetMap data and attribution</a>
+<div class="consent-title"><span class="consent-pin" aria-hidden="true">⌖</span><span><small>ILLUSTRATIVE MAP PREVIEW</small><h2>Explore the real map</h2></span></div>
+<p>Live map tiles reveal your IP address, website origin and map area to the tile provider. Your device location is never requested automatically.</p>
+<button id="load-map" class="primary-action" type="button">Load live map <span aria-hidden="true">↗</span></button>
+<a href="https://www.openstreetmap.org/copyright" rel="noopener noreferrer" target="_blank">OpenStreetMap data and attribution</a>
 </div>
 </div>
 <div class="map-topline"><span class="map-live-dot" aria-hidden="true"></span><span id="map-mode">Map not loaded</span></div>

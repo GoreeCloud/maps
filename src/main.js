@@ -40,7 +40,19 @@ function cancelPendingDeviceLocation() {
   button.disabled = false;
   button.removeAttribute('aria-busy');
 }
+function setSheetExpanded(expanded) {
+  const sheet = document.querySelector('.sidebar');
+  sheet.classList.toggle('expanded', expanded);
+  const toggle = el('sheet-toggle');
+  toggle.setAttribute('aria-expanded', String(expanded));
+  el('sheet-toggle-label').textContent = expanded ? 'Minimize map tools' : 'Show map tools';
+}
+el('sheet-toggle').addEventListener('click', () => {
+  setSheetExpanded(!document.querySelector('.sidebar').classList.contains('expanded'));
+});
 const chooseView = (view) => {
+  document.querySelector('.sidebar').dataset.activeView = view;
+  setSheetExpanded(true);
   document.querySelectorAll('[data-panel]').forEach((panel) => { panel.hidden = panel.dataset.panel !== view; });
   document.querySelectorAll('[data-view]').forEach((button) => {
     const active = button.dataset.view === view;
@@ -105,6 +117,7 @@ function selectPoint(point, label) {
   const title = cleanLabel(label) || 'Pinned location';
   state.selection = { point: [...point], label: title };
   renderSelection();
+  if (!document.querySelector('[data-panel="explore"]').hidden) setSheetExpanded(true);
   if (document.querySelector('[data-panel="route"]').hidden === false) {
     const which = state.pick;
     if (which === 'start') {
@@ -164,6 +177,8 @@ async function loadMap() {
     if (token !== state.mapRequestId) return;
     state.engine = engine;
     state.map = new engine.Map({container: 'map', style: mapStyle(), center: WORLD_CENTER, zoom: 3.6, attributionControl: true, maxZoom: 19});
+    el('map').classList.add('live');
+    el('map-preview-note').hidden = true;
     state.map.on('click', (event) => selectPoint([event.lngLat.lng, event.lngLat.lat], 'Pinned location'));
     state.map.on('moveend', () => {
       el('map-coordinates').textContent = formatPoint([state.map.getCenter().lng, state.map.getCenter().lat]);
@@ -176,6 +191,8 @@ async function loadMap() {
   } catch {
     if (token === state.mapRequestId) {
       state.map?.remove(); state.map = null;
+      el('map').classList.remove('live');
+      el('map-preview-note').hidden = false;
       status('Unable to start map rendering on this device.');
     }
   } finally {
@@ -205,6 +222,8 @@ el('reload-tiles').addEventListener('click', () => {
   }
   invalidateRoute();
   state.map?.remove(); state.map = null;
+  el('map').classList.remove('live');
+  el('map-preview-note').hidden = false;
   state.markerStart = null; state.markerEnd = null;
   el('map-consent').hidden = false;
   el('map-mode').textContent = 'Map not loaded';
@@ -436,6 +455,8 @@ el('route-button').addEventListener('click', async () => {
 
 el('search-form').addEventListener('submit', async (event) => {
   event.preventDefault();
+  // Search lives above the map, but its accessible results live in Explore.
+  chooseView('explore');
   const query = el('search-input').value.trim();
   const directPoint = parsePoint(query);
   if (directPoint) {
