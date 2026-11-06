@@ -26,8 +26,11 @@
 <button class="nav-item" type="button" data-view="privacy"><span aria-hidden="true">☷</span> Privacy</button>
 </nav>
 <main class="workspace">
-<section class="sidebar" aria-label="Map tools">
-<div class="sidebar-scroll">
+<section class="sidebar" aria-label="Map tools" data-active-view="explore">
+<button class="sheet-toggle" id="sheet-toggle" type="button" aria-expanded="false" aria-controls="sidebar-scroll">
+<span class="sheet-grip" aria-hidden="true"></span><span id="sheet-toggle-label">Show map tools</span><span class="sheet-toggle-chevron" aria-hidden="true">⌃</span>
+</button>
+<div class="sidebar-scroll" id="sidebar-scroll">
 <div class="view" data-panel="explore">
 <p class="eyebrow">EXPLORE</p>
 <h1>Find your next stop.</h1>
@@ -90,7 +93,7 @@
 <div id="map-preview-note" class="map-preview-note" aria-hidden="true">Illustrative preview · no live tiles loaded</div>
 <div id="map-consent" class="map-consent">
 <div class="consent-card">
-<div class="consent-title"><span class="consent-pin" aria-hidden="true">⌖</span><span><small>MAP PREVIEW</small><h2>Explore the real map</h2></span></div>
+<div class="consent-title"><span class="consent-pin" aria-hidden="true">⌖</span><span><small>ILLUSTRATIVE MAP PREVIEW</small><h2>Explore the real map</h2></span></div>
 <p>Live map tiles reveal your IP address, website origin and map area to the tile provider. Your device location is never requested automatically.</p>
 <button id="load-map" class="primary-action" type="button">Load live map <span aria-hidden="true">↗</span></button>
 <a href="https://www.openstreetmap.org/copyright" rel="noopener noreferrer" target="_blank">OpenStreetMap data and attribution</a>
