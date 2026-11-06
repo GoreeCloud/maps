@@ -93,7 +93,8 @@ async function journey(browser, base, name, width, height, contrast) {
     // The persistent destination is authoritative; transient status text may change
     // when map tiles load or report errors after the keyboard activation.
     await page.locator('#end-label').filter({hasText:'Map center'}).waitFor();
-    await page.locator('#selection-card').filter({hasText:'Map center'}).waitFor();
+    // Selection card is in Explore and remains hidden while Routes is active.
+    assert.match(await page.locator('#selection-card').textContent(), /Map center/);
     assert.equal(await page.locator('#pin-center').isEnabled(),true);
     await page.screenshot({path:resolve(evidence,name+'-map.png')});
 
