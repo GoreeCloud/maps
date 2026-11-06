@@ -111,6 +111,17 @@ async function runProfile(browser, base, profile) {
     assert.match(gpxText,/<name>Synthetic saved point<\/name>/);
     assert.match(gpxText,/<name>Second synthetic point<\/name>/);
     assert.ok(!gpxText.includes('<time>'), 'do not invent waypoint timestamps');
+    const geojsonExport = await page.locator('#export-places').boundingBox();
+    const geojsonImport = await page.locator('#import-places-button').boundingBox();
+    const gpxExport = await page.locator('#export-gpx').boundingBox();
+    if (profile.width > 360) {
+      assert.ok(Math.abs(geojsonExport.y - geojsonImport.y) < 2,
+        'GeoJSON export and import should share a row');
+      assert.ok(gpxExport.y >= geojsonExport.y + geojsonExport.height,
+        'GPX export should occupy the next row');
+      assert.ok(gpxExport.width > geojsonExport.width + geojsonImport.width,
+        'GPX export should span both columns');
+    }
     await page.screenshot({path:resolve(evidence,profile.name+'-saved.png')});
 
     await page.locator('[data-view="route"]').click();
