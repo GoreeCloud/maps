@@ -4,12 +4,14 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import './style.css';
 import { WORLD_CENTER, validPoint, parsePoint, formatPoint, cleanLabel, readSaved, formatDuration, formatDistance } from './lib/geo.js';
 import { exportSavedGeoJSON, importSavedGeoJSON, mergeSavedPlaces, MAX_IMPORT_BYTES } from './lib/geojson.js';
+import { createRouteRequestGuard } from './lib/route-request.js';
 
 setWorkerUrl(workerUrl);
 const el = (id) => document.getElementById(id);
 const SAVE_KEY = 'goreecloud.maps.saved.v1';
 const THEME_KEY = 'goreecloud.maps.theme.v1';
 const state = { map: null, start: null, end: null, selection: null, pick: 'end', markerStart: null, markerEnd: null, saved: [], config: null };
+const routeGuard = createRouteRequestGuard();
 const safeStore = {
   get(key) { try { return localStorage.getItem(key); } catch { return null; } },
   set(key, value) { try { localStorage.setItem(key, value); return true; } catch { return false; } },
@@ -62,6 +64,17 @@ function setMarker(which, point) {
     .setLngLat(point).addTo(state.map);
 }
 
+function invalidateRoute() {
+  routeGuard.invalidate();
+  const route = state.map?.getSource('goree-route');
+  if (route) route.setData({type:'FeatureCollection',features:[]});
+  const summary = el('route-summary');
+  if (['loading','ready'].includes(summary.dataset.routeState)) {
+    summary.textContent = 'Route points changed. Calculate a new driving route.';
+  }
+  summary.dataset.routeState = 'stale';
+}
+
 function selectPoint(point, label) {
   if (!validPoint(point)) return;
   const title = cleanLabel(label) || 'Pinned location';
@@ -70,11 +83,13 @@ function selectPoint(point, label) {
   if (document.querySelector('[data-panel="route"]').hidden === false) {
     const which = state.pick;
     state[which] = [...point];
+    invalidateRoute();
     el(which === 'start' ? 'start-label' : 'end-label').textContent = title;
     setMarker(which, point);
     status((which === 'start' ? 'Start' : 'Destination') + ' selected. ' + formatPoint(point));
   } else {
     state.end = [...point];
+    invalidateRoute();
     el('end-label').textContent = title;
     setMarker('end', point);
     status('Selected ' + formatPoint(point) + '. Save or plan a route.');
@@ -230,9 +245,8 @@ el('apply-route-coordinates').addEventListener('click', () => {
   if (state.map) {
     setMarker('start', start);
     setMarker('end', end);
-    const source = state.map.getSource('goree-route');
-    if (source) source.setData({type:'FeatureCollection',features:[]});
   }
+  invalidateRoute();
   el('route-summary').textContent = 'Points set. Find driving route to calculate a new route.';
   status('Start and destination set locally, without device location.');
 });
@@ -244,6 +258,7 @@ el('use-location').addEventListener('click', () => {
   status('Requesting location permission from your browser…');
   navigator.geolocation.getCurrentPosition(({coords}) => {
     state.start = [coords.longitude, coords.latitude]; state.pick = 'end';
+    invalidateRoute();
     el('start-label').textContent = 'My current location (this session)';
     setMarker('start', state.start);
     state.map.flyTo({center: state.start, zoom: 13});
@@ -255,25 +270,38 @@ el('route-button').addEventListener('click', async () => {
   if (!state.config?.routing) { status('Routing requires an operator-configured OSRM service.'); return; }
   if (!validPoint(state.start) || !validPoint(state.end)) { status('Choose a start and destination first.'); return; }
   const btn = el('route-button'); btn.disabled = true;
-  const summary = el('route-summary'); summary.textContent = 'Calculating driving route…';
+  const version = routeGuard.begin();
+  const start = [...state.start], end = [...state.end];
+  const priorRoute = state.map?.getSource('goree-route');
+  if (priorRoute) priorRoute.setData({type:'FeatureCollection', features:[]});
+  const summary = el('route-summary');
+  summary.dataset.routeState = 'loading';
+  summary.textContent = 'Calculating driving route…';
   try {
     const response = await fetch('/api/route', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({start:state.start.join(','), end:state.end.join(',')}),
+      body:JSON.stringify({start:start.join(','), end:end.join(',')}),
       cache:'no-store'
     });
     const payload = await response.json();
+    if (!routeGuard.isCurrent(version)) return;
     if (!response.ok) throw new Error(payload.error || 'Routing provider unavailable.');
     if (!Array.isArray(payload.coordinates) || payload.coordinates.length < 2) throw new Error('No usable route was returned.');
     drawRoute(payload.coordinates);
+    summary.dataset.routeState = 'ready';
     summary.replaceChildren();
     const heading = document.createElement('strong'); heading.textContent = formatDuration(payload.duration) + ' · ' + formatDistance(payload.distance);
     const note = document.createElement('p'); note.textContent = 'Driving route · Based on configured OSRM data, not live traffic.';
     summary.append(heading, note);
     status('Route found. Guidance and traffic updates are not enabled in this preview.');
-  } catch (error) { summary.textContent = error.message || 'Route calculation failed.'; status('Could not calculate route.'); }
-  finally { btn.disabled = false; }
+  } catch (error) {
+    if (routeGuard.isCurrent(version)) {
+      summary.dataset.routeState = 'error';
+      summary.textContent = error.message || 'Route calculation failed.';
+      status('Could not calculate route.');
+    }
+  } finally { btn.disabled = false; }
 });
 
 el('search-form').addEventListener('submit', async (event) => {
