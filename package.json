@@ -13,6 +13,7 @@
     "check": "node --check src/main.js && node --check server/app.mjs"
   },
   "dependencies": {
+    "@goreecloud/gc-ui": "https://github.com/GoreeCloud/gc-ui/releases/download/foundations-v1.0.1/goreecloud-gc-ui-1.0.1.tgz",
     "maplibre-gl": "6.16.0"
   },
   "devDependencies": {
