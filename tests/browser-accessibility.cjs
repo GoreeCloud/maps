@@ -90,7 +90,10 @@ async function journey(browser, base, name, width, height, contrast) {
     await page.locator('.maplibregl-canvas').waitFor({state:'visible',timeout:15000});
     await page.locator('#pin-center').focus();
     await page.keyboard.press('Enter');
-    await page.locator('#status').filter({hasText:'selected'}).waitFor();
+    // The persistent destination is authoritative; transient status text may change
+    // when map tiles load or report errors after the keyboard activation.
+    await page.locator('#end-label').filter({hasText:'Map center'}).waitFor();
+    await page.locator('#selection-card').filter({hasText:'Map center'}).waitFor();
     assert.equal(await page.locator('#pin-center').isEnabled(),true);
     await page.screenshot({path:resolve(evidence,name+'-map.png')});
 
