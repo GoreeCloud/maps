@@ -5,7 +5,7 @@
  */
 const assert=require('node:assert/strict');
 const {execFileSync}=require('node:child_process');
-const {mkdir}=require('node:fs/promises');
+const {mkdir,stat}=require('node:fs/promises');
 const {resolve}=require('node:path');
 const {chromium}=require('playwright');
 const evidence=resolve(process.env.MAPS_BROWSER_EVIDENCE||'browser-evidence');
@@ -108,7 +108,11 @@ async function main(){
       // External map tiles must not load when the map has not been explicitly requested.
       assert.equal((await metrics()).mapConsentVisible,true);
       try{
-        await page.screenshot({path:resolve(evidence,'native-browser-zoom-'+scale*100+'.png'),animations:'disabled',timeout:12000});
+        const screenshotFile=resolve(evidence,'native-browser-zoom-'+scale*100+'.png');
+        await page.screenshot({path:screenshotFile,animations:'disabled',timeout:12000});
+        if((await stat(screenshotFile)).size<2048){
+          console.warn('WARN: native zoom screenshot has little image detail; do not count as visual acceptance');
+        }
       }catch(err){
         console.warn('Screenshot unsupported on this Xvfb/GPU combination: '+err.message.split('\n')[0]);
       }
