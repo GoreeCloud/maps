@@ -69,6 +69,14 @@ async function main(){
         'Browser viewport did not truly reflow at '+scale*100+'%');
       assert.ok(state.htmlOverflow<=1,'HTML horizontal overflow at native zoom '+scale*100+'%: '+state.htmlOverflow);
       assert.ok(state.bodyOverflow<=1,'Body horizontal overflow at native zoom '+scale*100+'%: '+state.bodyOverflow);
+      assert.ok(state.totalPageHeight>state.height+100,
+        'Document must allow vertical scrolling at high zoom rather than trap all content behind overlays');
+      const layout=await page.evaluate(()=>({
+        header:getComputedStyle(document.querySelector('.app-header')).position,
+        nav:getComputedStyle(document.querySelector('.app-nav')).position
+      }));
+      assert.notEqual(layout.header,'absolute','Header must not obscure content at high zoom');
+      assert.notEqual(layout.nav,'absolute','Navigation must not obscure content at high zoom');
       // Keyboard navigation at genuine browser zoom, before any map or location consent.
       for(const view of ['explore','route','saved','privacy']){
         const tab=page.locator('[data-view="'+view+'"]');
@@ -82,8 +90,21 @@ async function main(){
       await tab.focus();await tab.press('Enter');
       await page.locator('#import-places-button').scrollIntoViewIfNeeded();
       const rect=await page.locator('#import-places-button').boundingBox();
-      assert.ok(rect&&rect.width>20&&rect.x>=-1&&rect.x+rect.width<=state.width+1,
-        'GeoJSON import control must fit horizontally at '+scale*100+'%');
+      assert.ok(rect&&rect.width>20&&rect.x>=-1&&rect.x+rect.width<=state.width+1 &&
+        rect.y>=-1 && rect.y+rect.height<=state.height+1,
+        'GeoJSON import control must be reachable within the visible viewport at '+scale*100+'%');
+      const targetHit=await page.evaluate(()=>{
+        const element=document.querySelector('#import-places-button');
+        const r=element.getBoundingClientRect();
+        return element.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));
+      });
+      assert.ok(targetHit,'GeoJSON import button must not be visually blocked by an overlay');
+      // Verify that the attribution can be reached without loading any external map service.
+      const attribution=page.locator('#map-consent a');
+      await attribution.scrollIntoViewIfNeeded();
+      const license=await attribution.boundingBox();
+      assert.ok(license && license.y>=-1 && license.y+license.height<=state.height+1,
+        'Map data attribution must remain reachable at '+scale*100+'%');
       // External map tiles must not load when the map has not been explicitly requested.
       assert.equal((await metrics()).mapConsentVisible,true);
       try{
