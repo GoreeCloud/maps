@@ -5,6 +5,7 @@ import './style.css';
 import { WORLD_CENTER, validPoint, parsePoint, formatPoint, cleanLabel, readSaved, formatDuration, formatDistance } from './lib/geo.js';
 import { exportSavedGeoJSON, importSavedGeoJSON, mergeSavedPlaces, MAX_IMPORT_BYTES } from './lib/geojson.js';
 import { createRouteRequestGuard } from './lib/route-request.js';
+import { createSafeStore } from './lib/storage.js';
 
 setWorkerUrl(workerUrl);
 const el = (id) => document.getElementById(id);
@@ -12,11 +13,7 @@ const SAVE_KEY = 'goreecloud.maps.saved.v1';
 const THEME_KEY = 'goreecloud.maps.theme.v1';
 const state = { map: null, start: null, end: null, selection: null, pick: 'end', markerStart: null, markerEnd: null, saved: [], config: null };
 const routeGuard = createRouteRequestGuard();
-const safeStore = {
-  get(key) { try { return localStorage.getItem(key); } catch { return null; } },
-  set(key, value) { try { localStorage.setItem(key, value); return true; } catch { return false; } },
-  remove(key) { try { localStorage.removeItem(key); } catch {} }
-};
+const safeStore = createSafeStore();
 state.saved = readSaved(safeStore.get(SAVE_KEY));
 const status = (message) => { el('status').textContent = message; };
 const hasMap = () => { if (state.map) return true; status('Load the map before choosing a point.'); return false; };
@@ -160,9 +157,13 @@ el('save-selection').addEventListener('click', () => {
   const clean = cleanLabel(label);
   if (!clean) { status('Enter a name for the place.'); return; }
   const entry = {point: state.selection.point, label: clean};
-  state.saved = [entry, ...state.saved.filter((p) => formatPoint(p.point) !== formatPoint(entry.point))].slice(0, 100);
-  if (!safeStore.set(SAVE_KEY, JSON.stringify(state.saved))) status('Browser storage unavailable. The place could not be saved.');
-  else status('Saved to this browser only.');
+  const proposed = [entry, ...state.saved.filter((p) => formatPoint(p.point) !== formatPoint(entry.point))].slice(0, 100);
+  if (!safeStore.set(SAVE_KEY, JSON.stringify(proposed))) {
+    status('Browser storage unavailable. The place could not be saved.');
+    return;
+  }
+  state.saved = proposed;
+  status('Saved to this browser only.');
 });
 
 function renderSaved() {
@@ -185,7 +186,16 @@ function renderSaved() {
     });
     const remove = document.createElement('button'); remove.className = 'remove'; remove.type = 'button';
     remove.textContent = 'Remove'; remove.setAttribute('aria-label', 'Remove ' + item.label);
-    remove.addEventListener('click', () => { state.saved.splice(index, 1); safeStore.set(SAVE_KEY, JSON.stringify(state.saved)); renderSaved(); });
+    remove.addEventListener('click', () => {
+      const proposed = state.saved.filter((_, position) => position !== index);
+      if (!safeStore.set(SAVE_KEY, JSON.stringify(proposed))) {
+        status('Browser storage unavailable. The place was not removed.');
+        return;
+      }
+      state.saved = proposed;
+      renderSaved();
+      status('Place removed from this browser.');
+    });
     row.append(button, remove); list.append(row);
   });
 }
@@ -229,7 +239,12 @@ el('import-places').addEventListener('change', async (event) => {
 el('clear-saved').addEventListener('click', () => {
   if (!state.saved.length) { status('No saved places to erase.'); return; }
   if (!window.confirm('Erase all saved GoreeCloud Maps places from this browser?')) return;
-  state.saved = []; safeStore.remove(SAVE_KEY); renderSaved();
+  if (!safeStore.remove(SAVE_KEY)) {
+    status('Browser storage unavailable. Could not confirm saved places were erased.');
+    return;
+  }
+  state.saved = [];
+  renderSaved();
   status('Saved places erased from this browser.');
 });
 
