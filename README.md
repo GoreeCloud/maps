@@ -23,11 +23,11 @@ No real-time traffic, turn-by-turn voice guidance, offline tile downloads, satel
 
 Requires Node 22+. Review dependencies and their licenses before installation.
 
-1. Run `npm install` (the dependency lockfile is not yet committed).
+1. Run `npm ci` to install the verified dependency versions from the committed `package-lock.json`. Review package sources, code and licenses before installation.
 2. Copy `.env.example` to `.env`, or supply the optional server environment variables through your shell.
 3. In terminal one, run `npm run api` (default 127.0.0.1:8787).
 4. In terminal two, run `npm run dev` and open the displayed local Vite URL.
-5. Run `npm test`, `npm run check`, and `npm run build`. GitHub Actions runs separate synthetic Playwright desktop/tablet/phone checks; see [status](docs/STATUS.md) for observed evidence.
+5. Run `npm test`, `npm run check`, and `npm run build`. GitHub Actions performs a clean lockfile install and runs separate synthetic Playwright desktop/tablet/phone checks; see [status](docs/STATUS.md) for observed evidence.
 
 To serve built files, run `npm run build` then `npm run preview`; the preview server listens on 127.0.0.1:8787, not a public interface. Do not expose it directly to the internet without production hardening and a trusted HTTPS gateway.
 
