@@ -100,6 +100,17 @@ async function runProfile(browser, base, profile) {
       page.waitForEvent('download'),page.locator('#export-places').click()
     ]);
     assert.match(download.suggestedFilename(),/\.geojson$/);
+    const [gpxDownload] = await Promise.all([
+      page.waitForEvent('download'),page.locator('#export-gpx').click()
+    ]);
+    assert.match(gpxDownload.suggestedFilename(),/\.gpx$/);
+    const gpxStream = await gpxDownload.createReadStream();
+    let gpxText = '';
+    for await (const chunk of gpxStream) gpxText += chunk.toString('utf8');
+    assert.match(gpxText,/<gpx[^>]+version="1\.1"/);
+    assert.match(gpxText,/<name>Synthetic saved point<\/name>/);
+    assert.match(gpxText,/<name>Second synthetic point<\/name>/);
+    assert.ok(!gpxText.includes('<time>'), 'do not invent waypoint timestamps');
     await page.screenshot({path:resolve(evidence,profile.name+'-saved.png')});
 
     await page.locator('[data-view="route"]').click();

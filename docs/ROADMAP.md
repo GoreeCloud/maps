@@ -12,7 +12,7 @@ All items below are **planned**, not current product capabilities.
 - Profile map renderer performance and network consumption on real mobile devices; synthetic CI checks that the map code bundle is not fetched before the consent action.
 
 ## P1 — Useful travel features
-- Richer geocoding, reverse geocoding, POI details, saved route plans, GPX, and richer GeoJSON geometry compatibility.
+- Richer geocoding, reverse geocoding, POI details, saved route plans, **GPX waypoint import and route-track interchange** (waypoint export is already implemented), and richer GeoJSON geometry compatibility.
 - Walking and cycling profiles, route alternatives, estimated arrival times and route instruction steps.
 - EV routing, charging station connectors and local transit data integration.
 - Progressive web app installability, offline-first UI shell and compliant self-hosted offline tiles.
