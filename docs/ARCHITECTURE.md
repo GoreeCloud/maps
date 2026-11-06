@@ -13,6 +13,10 @@
 
 GitHub Actions uses pinned Playwright in an isolated test job. One suite runs synthetic Chromium interaction journeys at desktop, tablet and phone sizes. An additional suite runs keyboard interaction and forced-colors checks at desktop and phone sizes, including consent-link reachability, tab-panel scroll reset, map-center keyboard selection and map-status/control separation. The test server uses synthetic in-process Nominatim/OSRM responses and intercepts OpenStreetMap tile URLs with a tiny local PNG, so CI does not depend on public tile load or real device location. Synthetic screenshots are retained as short-lived GitHub Actions artifacts. A scoped human screenshot review examined the reported phone layout defects (see [UI QA review](UI-QA-2026-11-06.md)); neither it nor CI establishes full aesthetic acceptance, screen-reader compliance, real-provider precision, native-client validation or production readiness.
 
+## Consent-gated renderer loading
+
+MapLibre JS and its worker are loaded through dynamic module imports only after the user intentionally chooses to load the map. Before that action the page still retrieves same-origin app/config resources, but it does not fetch the large renderer chunk or external map tiles. The map-load request generation invalidates a pending asynchronous renderer initialization if the user reopens the network-consent screen. This does not retroactively cancel requests already sent, nor guarantee third-party network isolation after map loading. See [PR #11](https://github.com/GoreeCloud/maps/pull/11) and [synthetic browser CI](https://github.com/GoreeCloud/maps/actions/runs/42295292604).
+
 ## Required platform assessment (MIPS)
 - **GC UI:** adopted verified design vocabulary as a local interface implementation; shared package integration and visual acceptance pending.
 - **GoreeShield:** privacy-oriented behavior implemented locally; actual central integration pending.
