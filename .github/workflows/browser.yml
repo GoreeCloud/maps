@@ -9,7 +9,7 @@ jobs:
   browser:
     name: Three-viewport browser checks
     runs-on: ubuntu-24.04
-    timeout-minutes: 16
+    timeout-minutes: 23
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
       - uses: actions/setup-node@v4
@@ -36,6 +36,14 @@ jobs:
         env:
           MAPS_BROWSER_EVIDENCE: browser-evidence
         run: node tests/browser-reflow.cjs
+      - name: Prepare isolated native browser zoom tooling
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends x11-utils xvfb libxtst6
+      - name: Verify actual Chromium browser zoom (200% and 400%)
+        env:
+          MAPS_BROWSER_EVIDENCE: browser-evidence
+        run: GC_MAPS_ISOLATED_DISPLAY=1 XDG_SESSION_TYPE=x11 GDK_BACKEND=x11 xvfb-run -a -s '-screen 0 1440x900x24' node tests/browser-native-zoom.cjs
       - name: Preserve test screenshots
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
