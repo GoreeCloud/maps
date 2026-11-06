@@ -3,8 +3,8 @@
 All items below are **planned**, not current product capabilities.
 
 ## P0 — Validate foundation
-- Pin reproducible dependency lockfile, run software composition audit, and check MapLibre/Vite builds on clean systems.
-- Test real browser map rendering and interaction in desktop, tablet, phone, light and dark, keyboard-only and screen-reader scenarios.
+- Commit and verify the missing dependency lockfile; move CI to `npm ci` only after readback and clean-install checks. Maintain dependency advisories and complete broader third-party provenance review.
+- Expand passing *synthetic* three-viewport Chromium smoke checks to human-reviewed screenshots, real phones/tablets, light/dark and increased-contrast visual acceptance, keyboard-only flows, and screen-reader testing.
 - Verify accessible keyboard map selection, tile-provider attribution, cookie/privacy exposure, CSP and proper Referrer-Policy.
 - Connect authorized own-hosted map tiles, Nominatim and OSRM; verify service capacity, data freshness, licensing, alerts and observability.
 - Integrate approved GoreeCloud UI tokens/components and document five-platform MIPS assessment.

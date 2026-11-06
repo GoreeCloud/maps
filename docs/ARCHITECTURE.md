@@ -9,6 +9,10 @@
 - **Failure behavior:** missing geocoder/router returns 503, bad coordinates return 400, upstream failure returns a bounded 502, client displays actionable errors.
 - **Scope boundaries:** no persistent backend account database, no traffic telemetry ingestion, no ads, no autonomous location tracking, no background synchronization, no offline tile downloads.
 
+## Automated browser evidence
+
+GitHub Actions uses pinned Playwright in an isolated test job to run Chromium interactions at three viewport sizes. The test server uses synthetic in-process Nominatim/OSRM responses and intercepts OpenStreetMap tile URLs with a tiny local PNG, so CI does not depend on public tile load or real device location. Synthetic screenshots are retained as short-lived GitHub Actions artifacts. CI success is evidence of those exercised browser flows, not a human aesthetic assessment, screen-reader compliance, real-provider precision, native-client validation or production readiness.
+
 ## Required platform assessment (MIPS)
 - **GC UI:** adopted verified design vocabulary as a local interface implementation; shared package integration and visual acceptance pending.
 - **GoreeShield:** privacy-oriented behavior implemented locally; actual central integration pending.
