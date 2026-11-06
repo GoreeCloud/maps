@@ -41,6 +41,10 @@ function inViewport(r,width,label){
         const input=await page.locator('#search-form').boundingBox();
         inViewport(input,width,name+' floating search');
         assert.ok(input.y<height*.25,name+': search should be at top of map');
+        const nav=await page.locator('.app-nav').boundingBox();
+        inViewport(nav,width,name+' primary navigation dock');
+        assert.ok(nav.y>=-1&&nav.y+nav.height<=height+1,
+          name+': navigation dock must be visible within the screen');
         const sheet=await page.locator('.sidebar').boundingBox();
         inViewport(sheet,width,name+' floating tools');
         if(width<=700){
