@@ -45,4 +45,4 @@ Original first-party code: MIT License (see [LICENSE](LICENSE)). Map renderer: [
 
 ## Architecture and delivery
 
-See [architecture](docs/ARCHITECTURE.md), [status](docs/STATUS.md), and [roadmap](docs/ROADMAP.md). The five GoreeCloud integrated platform systems have not yet been verified as fully integrated; this preview is **not Anchor or production-ready**.
+See [architecture](docs/ARCHITECTURE.md), [status](docs/STATUS.md), [roadmap](docs/ROADMAP.md), and [scoped UI QA review](docs/UI-QA-2026-11-06.md). The five GoreeCloud integrated platform systems have not yet been verified as fully integrated; this preview is **not Anchor or production-ready**.

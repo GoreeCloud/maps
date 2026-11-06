@@ -11,7 +11,7 @@
 
 ## Automated browser evidence
 
-GitHub Actions uses pinned Playwright in an isolated test job to run Chromium interactions at three viewport sizes. The test server uses synthetic in-process Nominatim/OSRM responses and intercepts OpenStreetMap tile URLs with a tiny local PNG, so CI does not depend on public tile load or real device location. Synthetic screenshots are retained as short-lived GitHub Actions artifacts. CI success is evidence of those exercised browser flows, not a human aesthetic assessment, screen-reader compliance, real-provider precision, native-client validation or production readiness.
+GitHub Actions uses pinned Playwright in an isolated test job. One suite runs synthetic Chromium interaction journeys at desktop, tablet and phone sizes. An additional suite runs keyboard interaction and forced-colors checks at desktop and phone sizes, including consent-link reachability, tab-panel scroll reset, map-center keyboard selection and map-status/control separation. The test server uses synthetic in-process Nominatim/OSRM responses and intercepts OpenStreetMap tile URLs with a tiny local PNG, so CI does not depend on public tile load or real device location. Synthetic screenshots are retained as short-lived GitHub Actions artifacts. A scoped human screenshot review examined the reported phone layout defects (see [UI QA review](UI-QA-2026-11-06.md)); neither it nor CI establishes full aesthetic acceptance, screen-reader compliance, real-provider precision, native-client validation or production readiness.
 
 ## Required platform assessment (MIPS)
 - **GC UI:** adopted verified design vocabulary as a local interface implementation; shared package integration and visual acceptance pending.
