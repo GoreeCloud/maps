@@ -139,7 +139,18 @@ async function runProfile(browser, base, profile) {
     await page.screenshot({path:resolve(evidence,profile.name+'-saved-light.png')});
 
     await page.locator('[data-view="explore"]').click();
+    // A synthetic page query checks that the community tile service gets the
+    // website origin (required by OSMF), never an application's query string.
+    await page.evaluate(() => history.replaceState(null, '', '/?privacy-test=synthetic'));
+    const firstTile = page.waitForRequest(
+      (request) => request.url().startsWith('https://tile.openstreetmap.org/'),
+      {timeout:15000}
+    );
     await page.locator('#load-map').click();
+    const tileRequest = await firstTile;
+    const tileHeaders = await tileRequest.allHeaders();
+    assert.equal(tileHeaders.referer, new URL(base).origin + '/',
+      'cross-origin tile Referer must contain the website origin only');
     await page.locator('#map-consent').waitFor({state:'hidden', timeout:15000});
     await page.locator('.maplibregl-canvas').waitFor({state:'visible', timeout:15000});
     const afterConsentMapChunk = await page.evaluate(() =>

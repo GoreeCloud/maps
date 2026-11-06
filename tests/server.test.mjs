@@ -24,7 +24,7 @@ test('read-only health/config, referrer privacy and disabled providers', async (
     const config = await fetch(base+'/api/config');
     const data = await config.json();
     assert.equal(data.search,false); assert.equal(data.routing,false);
-    assert.equal(config.headers.get('referrer-policy'),'no-referrer');
+    assert.equal(config.headers.get('referrer-policy'),'strict-origin-when-cross-origin');
     const disabled = await post(base,'/api/search',{q:'place'});
     assert.equal(disabled.status,503);
     const health = await fetch(base+'/api/health');

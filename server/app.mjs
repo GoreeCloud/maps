@@ -100,7 +100,9 @@ export function createMapsServer({env = process.env, fetchImpl = globalThis.fetc
   const requests = new Map();
   const headers = {
     'X-Content-Type-Options':'nosniff',
-    'Referrer-Policy':'no-referrer',
+    // OSMF's community tile policy requires a web Referer. This sends only the
+    // site origin cross-site, not search text, URL paths or coordinates from POST bodies.
+    'Referrer-Policy':'strict-origin-when-cross-origin',
     'X-Frame-Options':'DENY',
     'Permissions-Policy':'geolocation=(self), camera=(), microphone=()',
     'Content-Security-Policy':safeContentPolicy(config)
