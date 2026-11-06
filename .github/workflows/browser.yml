@@ -28,6 +28,10 @@ jobs:
         env:
           MAPS_BROWSER_EVIDENCE: browser-evidence
         run: node tests/browser-review.cjs
+      - name: Verify device-location callback revocation safety
+        env:
+          MAPS_BROWSER_EVIDENCE: browser-evidence
+        run: node tests/browser-location-consent.cjs
       - name: Verify keyboard, mobile layout and high-contrast interactions
         env:
           MAPS_BROWSER_EVIDENCE: browser-evidence
