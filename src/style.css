@@ -175,7 +175,7 @@ h1 em{font-style:normal;color:var(--primary)}
    Remove viewport-height traps and overlay navigation so controls remain
    reachable through ordinary document scrolling rather than nested clipping. */
 @media (max-width:700px) and (max-height:480px) {
-  html,body,#app{height:auto;min-height:100%;overflow-x:clip}
+  html,body,#app{height:auto;min-height:100%}
   .app-header{position:relative;top:auto;left:auto;right:auto;margin:8px 10px 0;
     height:48px;min-height:48px;pointer-events:auto}
   .brand{min-height:46px;padding:5px 10px 5px 5px;max-width:calc(100% - 58px)}
