@@ -15,11 +15,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Install application dependencies
-        run: npm install --no-fund --no-audit
+          cache: npm
+      - name: Install application dependencies from lockfile
+        run: npm ci --no-fund --no-audit
       - name: Install pinned browser test runner
         run: |
-          npm install --no-save --ignore-scripts --no-audit --no-fund playwright@1.64.1
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund playwright@1.64.1
           npx playwright install --with-deps chromium
       - name: Build browser client
         run: npm run build

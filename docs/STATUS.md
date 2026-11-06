@@ -14,7 +14,9 @@
 
 **Still unverified:** real hardware geolocation and touch behavior, screen-reader accessibility, complete keyboard-only/contrast/zoom audits, comprehensive GoreeCloud UI design-token and human visual acceptance, live geocoder/router and tile-service compatibility, provider licensing at production scale, operational HTTPS/reverse proxy, trusted deployments and production monitoring. CI uses mocked geocoder/router responses and intercepted tiles, not evidence of production navigation accuracy.
 
-**Unavailable in this milestone:** native Android/iOS, turn-by-turn navigation, traffic and crowd reports, elevation/3D, offline tile downloading, account sync and live business data. A reproducible dependency lockfile is not yet committed.
+**Dependency reproducibility (November 6, 2026):** `package-lock.json` v3 is committed, with 90 package entries and SHA-512 integrity records for 89 registry packages. Both GitHub workflows now install application dependencies with `npm ci`; Playwright remains a pinned ephemeral CI-only browser-test dependency. Initial lock creation used an isolated authorized development checkout and the production-dependency audit reported no findings. Repeat and verify these checks in the feature-branch and merged-main CI before treating clean installs as accepted.
+
+**Unavailable in this milestone:** native Android/iOS, turn-by-turn navigation, traffic and crowd reports, elevation/3D, offline tile downloading, account sync and live business data.
 
 **Design authority:** GoreeCloud UI. **Privacy authority:** GoreeShield. **Cybersecurity authority:** Wardveil. **Interoperability:** GoreeCloud Mesh. **Identity:** GoreeCloud Identity when applicable.
 
