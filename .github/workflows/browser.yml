@@ -1,0 +1,37 @@
+name: Maps browser smoke (synthetic)
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  browser:
+    name: Three-viewport browser checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install application dependencies
+        run: npm install --no-fund --no-audit
+      - name: Install pinned browser test runner
+        run: |
+          npm install --no-save --ignore-scripts --no-audit --no-fund playwright@1.64.1
+          npx playwright install --with-deps chromium
+      - name: Build browser client
+        run: npm run build
+      - name: Exercise synthetic browser journeys
+        env:
+          MAPS_BROWSER_EVIDENCE: browser-evidence
+        run: node tests/browser-review.cjs
+      - name: Preserve test screenshots
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: goreecloud-maps-browser-evidence
+          path: browser-evidence/
+          if-no-files-found: warn
+          retention-days: 7
