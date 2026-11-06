@@ -28,7 +28,7 @@ export function resolveConfig(env = process.env) {
   return {
     geocoder, router,
     tileUrl: env.MAPS_TILE_URL_TEMPLATE || 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-    attribution: cleanLabel(env.MAPS_TILE_ATTRIBUTION || '© OpenStreetMap contributors').slice(0,120),
+    attribution: env.MAPS_TILE_ATTRIBUTION ? cleanLabel(env.MAPS_TILE_ATTRIBUTION).slice(0,120).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;') : '<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a>',
     provider: env.MAPS_TILE_URL_TEMPLATE ? 'Configured tile provider' : 'OSM development tiles',
     tileOrigin: tile.origin
   };
