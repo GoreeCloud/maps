@@ -8,6 +8,7 @@ Privacy-first maps and navigation **development preview**. This repository is an
 - Explicit, permission-based browser geolocation; select points by clicking the map.
 - Local longitude,latitude coordinate lookup without any geocoding provider request.
 - Local-only saved places, browser-only preference, and erase-all control.
+- Saved-place GeoJSON import/export (local file only), with validation and duplicate-aware merging; accessible start/end coordinate entry. Browser/device acceptance pending.
 - Optional place search through a configured Nominatim-compatible upstream and driving routes through a configured OSRM-compatible upstream.
 - Same-origin Node proxy that validates requests, bounds provider replies and does not persist search queries or route coordinates.
 - Accessible, rounded and floating GoreeCloud UI-inspired controls, with light/dark appearance.

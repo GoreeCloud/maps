@@ -2,7 +2,7 @@
 
 **Stage:** Source development preview; not deployed or production accepted.
 
-**Source present:** Web map client, Node proxy scaffold with optional Nominatim/OSRM adapters, basic data validation, local saved locations, provider consent and automation tests.
+**Source present:** Web map client, Node proxy scaffold with optional Nominatim/OSRM adapters, basic data validation, local saved locations, local GeoJSON saved-place portability, manual route coordinate entry, provider consent and automation tests.
 
 **Functionality pending verification:** actual browser rendering, end-to-end geocoder/router data integration, device geolocation on hardware, visual acceptance, supplier licensing and production deployment. CI result and local test evidence must be recorded after execution, not inferred from workflow existence.
 
