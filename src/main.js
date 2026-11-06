@@ -40,7 +40,19 @@ function cancelPendingDeviceLocation() {
   button.disabled = false;
   button.removeAttribute('aria-busy');
 }
+function setSheetExpanded(expanded) {
+  const sheet = document.querySelector('.sidebar');
+  sheet.classList.toggle('expanded', expanded);
+  const toggle = el('sheet-toggle');
+  toggle.setAttribute('aria-expanded', String(expanded));
+  el('sheet-toggle-label').textContent = expanded ? 'Minimize map tools' : 'Show map tools';
+}
+el('sheet-toggle').addEventListener('click', () => {
+  setSheetExpanded(!document.querySelector('.sidebar').classList.contains('expanded'));
+});
 const chooseView = (view) => {
+  document.querySelector('.sidebar').dataset.activeView = view;
+  setSheetExpanded(true);
   document.querySelectorAll('[data-panel]').forEach((panel) => { panel.hidden = panel.dataset.panel !== view; });
   document.querySelectorAll('[data-view]').forEach((button) => {
     const active = button.dataset.view === view;
@@ -105,6 +117,7 @@ function selectPoint(point, label) {
   const title = cleanLabel(label) || 'Pinned location';
   state.selection = { point: [...point], label: title };
   renderSelection();
+  if (!document.querySelector('[data-panel="explore"]').hidden) setSheetExpanded(true);
   if (document.querySelector('[data-panel="route"]').hidden === false) {
     const which = state.pick;
     if (which === 'start') {
@@ -443,7 +456,7 @@ el('route-button').addEventListener('click', async () => {
 el('search-form').addEventListener('submit', async (event) => {
   event.preventDefault();
   // Search lives above the map, but its accessible results live in Explore.
-  if (document.querySelector('[data-panel="explore"]').hidden) chooseView('explore');
+  chooseView('explore');
   const query = el('search-input').value.trim();
   const directPoint = parsePoint(query);
   if (directPoint) {
