@@ -1,5 +1,3 @@
-import { Map, Marker, LngLatBounds, setWorkerUrl } from 'maplibre-gl';
-import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './style.css';
 import { WORLD_CENTER, validPoint, parsePoint, formatPoint, cleanLabel, readSaved, formatDuration, formatDistance } from './lib/geo.js';
@@ -7,11 +5,27 @@ import { exportSavedGeoJSON, importSavedGeoJSON, mergeSavedPlaces, MAX_IMPORT_BY
 import { createRouteRequestGuard } from './lib/route-request.js';
 import { createSafeStore } from './lib/storage.js';
 
-setWorkerUrl(workerUrl);
+// Load the heavy map renderer only after the visitor explicitly chooses to load a map.
+let mapEnginePromise;
+async function loadMapEngine() {
+  if (!mapEnginePromise) {
+    mapEnginePromise = Promise.all([
+      import('maplibre-gl'),
+      import('maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url')
+    ]).then(([engine, worker]) => {
+      engine.setWorkerUrl(worker.default);
+      return engine;
+    }).catch((error) => {
+      mapEnginePromise = null;
+      throw error;
+    });
+  }
+  return mapEnginePromise;
+}
 const el = (id) => document.getElementById(id);
 const SAVE_KEY = 'goreecloud.maps.saved.v1';
 const THEME_KEY = 'goreecloud.maps.theme.v1';
-const state = { map: null, start: null, end: null, selection: null, pick: 'end', markerStart: null, markerEnd: null, saved: [], config: null };
+const state = { map: null, engine: null, mapLoading: false, mapRequestId: 0, start: null, end: null, selection: null, pick: 'end', markerStart: null, markerEnd: null, saved: [], config: null };
 const routeGuard = createRouteRequestGuard();
 const safeStore = createSafeStore();
 state.saved = readSaved(safeStore.get(SAVE_KEY));
@@ -60,7 +74,7 @@ function setMarker(which, point) {
   if (!state.map || !validPoint(point)) return;
   const key = which === 'start' ? 'markerStart' : 'markerEnd';
   state[key]?.remove();
-  state[key] = new Marker({ color: which === 'start' ? '#16a38a' : '#5369eb' })
+  state[key] = new state.engine.Marker({ color: which === 'start' ? '#16a38a' : '#5369eb' })
     .setLngLat(point).addTo(state.map);
 }
 
@@ -108,7 +122,7 @@ function drawRoute(coords) {
     state.map.addSource('goree-route', {type: 'geojson', data});
     state.map.addLayer({id: 'goree-route-line', type: 'line', source: 'goree-route', paint: {'line-color': '#5369eb', 'line-width': 6, 'line-opacity': 0.9}, layout: {'line-cap': 'round', 'line-join': 'round'}});
   }
-  const bounds = coords.reduce((box, point) => box.extend(point), new LngLatBounds(coords[0], coords[0]));
+  const bounds = coords.reduce((box, point) => box.extend(point), new state.engine.LngLatBounds(coords[0], coords[0]));
   state.map.fitBounds(bounds, {padding: 85, maxZoom: 13});
 }
 
@@ -121,10 +135,20 @@ function mapStyle() {
 }
 
 async function loadMap() {
-  if (state.map) return;
+  if (state.map || state.mapLoading) return;
   if (!state.config) { status('Map configuration unavailable. Please reload.'); return; }
+  const token = ++state.mapRequestId;
+  const consentButton = el('load-map');
+  state.mapLoading = true;
+  consentButton.disabled = true;
+  consentButton.setAttribute('aria-busy', 'true');
+  status('Preparing map renderer…');
   try {
-    state.map = new Map({container: 'map', style: mapStyle(), center: WORLD_CENTER, zoom: 3.6, attributionControl: true, maxZoom: 19});
+    const engine = await loadMapEngine();
+    // Consent can be withdrawn while the module is downloading.
+    if (token !== state.mapRequestId) return;
+    state.engine = engine;
+    state.map = new engine.Map({container: 'map', style: mapStyle(), center: WORLD_CENTER, zoom: 3.6, attributionControl: true, maxZoom: 19});
     state.map.on('click', (event) => selectPoint([event.lngLat.lng, event.lngLat.lat], 'Pinned location'));
     state.map.on('moveend', () => {
       el('map-coordinates').textContent = formatPoint([state.map.getCenter().lng, state.map.getCenter().lat]);
@@ -134,9 +158,15 @@ async function loadMap() {
     el('map-consent').hidden = true;
     el('map-mode').textContent = 'Interactive map · ' + state.config.provider;
     for (const id of ['zoom-in','zoom-out','reset-view','pin-center']) el(id).disabled = false;
-  } catch (error) {
-    state.map?.remove(); state.map = null;
-    status('Unable to start map rendering on this device.');
+  } catch {
+    if (token === state.mapRequestId) {
+      state.map?.remove(); state.map = null;
+      status('Unable to start map rendering on this device.');
+    }
+  } finally {
+    state.mapLoading = false;
+    consentButton.disabled = false;
+    consentButton.removeAttribute('aria-busy');
   }
 }
 el('load-map').addEventListener('click', loadMap);
@@ -149,6 +179,8 @@ el('pin-center').addEventListener('click', () => {
   selectPoint([center.lng, center.lat], 'Map center');
 });
 el('reload-tiles').addEventListener('click', () => {
+  // Invalidate an asynchronous map load so it cannot reopen tiles after revocation.
+  state.mapRequestId += 1;
   state.map?.remove(); state.map = null;
   state.markerStart = null; state.markerEnd = null;
   el('map-consent').hidden = false;
