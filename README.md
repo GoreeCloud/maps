@@ -14,7 +14,7 @@ Privacy-first maps and navigation **development preview**. This repository is an
 - Optional place search through a configured Nominatim-compatible upstream and driving routes through a configured OSRM-compatible upstream.
 - Same-origin Node proxy using bounded JSON POST inputs for private search/route requests, provider reply limits, and no storage of search queries or route coordinates.
 - Accessible, rounded and floating GoreeCloud UI-inspired controls, with light/dark appearance.
-- Node tests, GitHub Actions security/build checks, and synthetic Chromium viewport, keyboard and forced-colors checks with screenshot artifacts; real device, screen-reader, and full visual-design acceptance remain pending.
+- Node tests, GitHub Actions security/build checks, synthetic three-viewport Chromium journeys, keyboard/forced-colors checks, and narrow CSS viewport reflow checks (640/320px), with screenshot artifacts. Actual browser zoom, real devices, screen readers and overall design acceptance remain pending.
 - A keyboard-operable "Pin map center" control can select the visible map position without pointer input.
 
 No real-time traffic, turn-by-turn voice guidance, offline tile downloads, satellite images, street imagery, production authentication, or device-native app is claimed.
