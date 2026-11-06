@@ -4,6 +4,33 @@ import {resolve, sep, extname} from 'node:path';
 import {parsePoint, validPoint, cleanLabel} from '../src/lib/geo.js';
 
 const MAX_BODY = 2_000_000;
+const MAX_REQUEST_BYTES = 4096;
+
+class InputError extends Error {
+  constructor(status, message) { super(message); this.status = status; }
+}
+
+async function readJsonRequest(req) {
+  if (!/^application\/json(?:\s*;\s*charset=utf-8)?$/i.test(req.headers['content-type'] || '')) {
+    throw new InputError(415, 'Send application/json.');
+  }
+  const length = req.headers['content-length'];
+  if (length !== undefined && (!/^\d+$/.test(length) || Number(length) > MAX_REQUEST_BYTES)) {
+    throw new InputError(413, 'Request body is too large.');
+  }
+  const chunks = [];
+  let total = 0;
+  for await (const chunk of req) {
+    total += chunk.byteLength;
+    if (total > MAX_REQUEST_BYTES) throw new InputError(413, 'Request body is too large.');
+    chunks.push(chunk);
+  }
+  try {
+    const value = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+    if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error();
+    return value;
+  } catch { throw new InputError(400, 'Send a JSON object.'); }
+}
 const JSON_HEADERS = {'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'};
 const MIME = {'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.ico':'image/x-icon','.json':'application/json; charset=utf-8','.webp':'image/webp','.woff2':'font/woff2','.wasm':'application/wasm'};
 
@@ -73,7 +100,7 @@ export function createMapsServer({env = process.env, fetchImpl = globalThis.fetc
   const requests = new Map();
   const headers = {
     'X-Content-Type-Options':'nosniff',
-    'Referrer-Policy':'strict-origin-when-cross-origin',
+    'Referrer-Policy':'no-referrer',
     'X-Frame-Options':'DENY',
     'Permissions-Policy':'geolocation=(self), camera=(), microphone=()',
     'Content-Security-Policy':safeContentPolicy(config)
@@ -92,17 +119,34 @@ export function createMapsServer({env = process.env, fetchImpl = globalThis.fetc
     catch { sendJson(res, 400, {error:'Invalid URL'}); return; }
     const path = url.pathname;
     if (path.startsWith('/api/')) {
-      if (req.method !== 'GET') { sendJson(res, 405, {error:'GET required'}, {'Allow':'GET'}); return; }
-      if (path === '/api/health') { sendJson(res, 200, {ok:true, stage:'development-preview'}); return; }
-      if (path === '/api/config') {
+      if (path === '/api/health' || path === '/api/config') {
+        if (req.method !== 'GET') { sendJson(res, 405, {error:'GET required'}, {'Allow':'GET'}); return; }
+        if (path === '/api/health') {
+          sendJson(res, 200, {ok:true, stage:'development-preview'}); return;
+        }
         sendJson(res, 200, {tileUrl:config.tileUrl, attribution:config.attribution, provider:config.provider, search:!!config.geocoder, routing:!!config.router});
         return;
       }
+      if (path !== '/api/search' && path !== '/api/route') {
+        sendJson(res, 404, {error:'Unknown API endpoint'}); return;
+      }
+      if (req.method !== 'POST') { sendJson(res, 405, {error:'POST required'}, {'Allow':'POST'}); return; }
+      if (url.search) { sendJson(res, 400, {error:'Send search and route inputs in the JSON request body.'}); return; }
+      const origin = req.headers.origin;
+      let validOrigin = true;
+      if (origin) {
+        try { validOrigin = new URL(origin).host === req.headers.host; }
+        catch { validOrigin = false; }
+      }
+      if (!validOrigin || req.headers['sec-fetch-site'] === 'cross-site') {
+        sendJson(res, 403, {error:'Cross-origin requests are not permitted.'}); return;
+      }
       if (!withinBudget(req.socket.remoteAddress || 'unknown')) { sendJson(res, 429, {error:'Too many requests. Try again shortly.'}); return; }
       try {
+        const input = await readJsonRequest(req);
         if (path === '/api/search') {
           if (!config.geocoder) { sendJson(res, 503, {error:'Search provider has not been configured.'}); return; }
-          const query = url.searchParams.get('q') || '';
+          const query = typeof input.q === 'string' ? input.q : '';
           if (query.trim().length < 2 || query.length > 120 || /[\u0000-\u001f\u007f]/.test(query)) {
             sendJson(res, 400, {error:'Search must contain 2–120 printable characters.'}); return;
           }
@@ -121,8 +165,8 @@ export function createMapsServer({env = process.env, fetchImpl = globalThis.fetc
         }
         if (path === '/api/route') {
           if (!config.router) { sendJson(res, 503, {error:'Routing provider has not been configured.'}); return; }
-          const start = parsePoint(url.searchParams.get('start'));
-          const end = parsePoint(url.searchParams.get('end'));
+          const start = parsePoint(input.start);
+          const end = parsePoint(input.end);
           if (!start || !end) { sendJson(res, 400, {error:'Provide valid start and end longitude,latitude points.'}); return; }
           if (start[0] === end[0] && start[1] === end[1]) { sendJson(res, 400, {error:'Start and destination must be different.'}); return; }
           const points = [start,end].map((p) => p.join(',')).join(';');
@@ -137,7 +181,10 @@ export function createMapsServer({env = process.env, fetchImpl = globalThis.fetc
           sendJson(res, 200, {coordinates:coords, distance:route.distance, duration:route.duration}); return;
         }
         sendJson(res, 404, {error:'Unknown API endpoint'}); return;
-      } catch {
+      } catch (error) {
+        if (error instanceof InputError) {
+          sendJson(res, error.status, {error:error.message}); return;
+        }
         // Never reflect geocoding queries, coordinates, provider URLs or raw provider errors.
         sendJson(res, 502, {error:'Map data provider is unavailable or returned invalid data.'}); return;
       }

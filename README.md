@@ -10,7 +10,7 @@ Privacy-first maps and navigation **development preview**. This repository is an
 - Local-only saved places, browser-only preference, and erase-all control.
 - Saved-place GeoJSON import/export (local file only), with validation and duplicate-aware merging; accessible start/end coordinate entry. Browser/device acceptance pending.
 - Optional place search through a configured Nominatim-compatible upstream and driving routes through a configured OSRM-compatible upstream.
-- Same-origin Node proxy that validates requests, bounds provider replies and does not persist search queries or route coordinates.
+- Same-origin Node proxy using bounded JSON POST inputs for private search/route requests, provider reply limits, and no storage of search queries or route coordinates.
 - Accessible, rounded and floating GoreeCloud UI-inspired controls, with light/dark appearance.
 - Node unit tests and GitHub Actions build checks.
 

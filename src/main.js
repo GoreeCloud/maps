@@ -257,8 +257,12 @@ el('route-button').addEventListener('click', async () => {
   const btn = el('route-button'); btn.disabled = true;
   const summary = el('route-summary'); summary.textContent = 'Calculating driving route…';
   try {
-    const params = new URLSearchParams({start: state.start.join(','), end: state.end.join(',')});
-    const response = await fetch('/api/route?' + params, {cache: 'no-store'});
+    const response = await fetch('/api/route', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({start:state.start.join(','), end:state.end.join(',')}),
+      cache:'no-store'
+    });
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.error || 'Routing provider unavailable.');
     if (!Array.isArray(payload.coordinates) || payload.coordinates.length < 2) throw new Error('No usable route was returned.');
@@ -286,7 +290,12 @@ el('search-form').addEventListener('submit', async (event) => {
   if (query.length < 2) { status('Search for at least two characters.'); return; }
   const list = el('search-results'); list.textContent = 'Searching…';
   try {
-    const response = await fetch('/api/search?q=' + encodeURIComponent(query), {cache: 'no-store'});
+    const response = await fetch('/api/search', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({q:query}),
+      cache:'no-store'
+    });
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.error || 'Search unavailable.');
     list.replaceChildren();
