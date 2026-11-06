@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#121b32">
+<meta name="description" content="Explore, save and plan with GoreeCloud Maps. Your location is yours to control.">
+<title>GoreeCloud Maps · Explore with clarity</title>
+</head>
+<body>
+<div id="app">
+<header class="app-header" aria-label="Application header">
+<a class="brand" href="/" aria-label="GoreeCloud Maps home"><span class="brand-mark" aria-hidden="true">◇</span><span><strong>GoreeCloud</strong><small>MAPS</small></span></a>
+<span class="preview-tag">Development preview</span>
+<button class="icon-button theme-toggle" type="button" id="theme-toggle" aria-label="Toggle dark and light appearance" title="Appearance">◐</button>
+</header>
+<nav class="app-nav" aria-label="Primary navigation">
+<button class="nav-item active" type="button" data-view="explore" aria-current="page"><span aria-hidden="true">⌕</span> Explore</button>
+<button class="nav-item" type="button" data-view="route"><span aria-hidden="true">↝</span> Routes</button>
+<button class="nav-item" type="button" data-view="saved"><span aria-hidden="true">♡</span> Saved</button>
+<button class="nav-item" type="button" data-view="privacy"><span aria-hidden="true">☷</span> Privacy</button>
+</nav>
+<main class="workspace">
+<section class="sidebar" aria-label="Map tools">
+<div class="sidebar-scroll">
+<div class="view" data-panel="explore">
+<p class="eyebrow">EXPLORE THE WORLD</p>
+<h1>Every journey<br><em>starts somewhere.</em></h1>
+<p class="lead">Search for places, explore the map and keep the spots that matter to you.</p>
+<form id="search-form" class="search-form" role="search">
+<label class="sr-only" for="search-input">Search for a place</label>
+<input id="search-input" type="search" autocomplete="off" maxlength="120" placeholder="Search places or addresses…" required>
+<button class="search-submit" type="submit" aria-label="Search">⌕</button>
+</form>
+<p class="help" id="search-hint">Search requires your configured geocoding service.</p>
+<div id="search-results" class="results" aria-live="polite"></div>
+<div class="section-title"><span>On the map</span><span class="muted">Choose any point</span></div>
+<div id="selection-card" class="selection-card empty"><span class="selection-emoji" aria-hidden="true">⌁</span><p>Tap the map to select a destination.</p></div>
+<button id="save-selection" class="secondary-action" type="button" disabled>♡ Save selected place</button>
+</div>
+<div class="view" data-panel="route" hidden>
+<p class="eyebrow">YOUR NEXT MOVE</p><h1>Make room<br><em>for discovery.</em></h1>
+<p class="lead">Choose start and destination points on the map. Routing is available when an OSRM-compatible service is configured.</p>
+<div class="route-steps">
+<button id="choose-start" class="point-button" type="button"><span class="point-icon origin" aria-hidden="true">○</span><span><small>START</small><strong id="start-label">Choose on map</strong></span></button>
+<div class="route-divider" aria-hidden="true"></div>
+<button id="choose-end" class="point-button" type="button"><span class="point-icon destination" aria-hidden="true">●</span><span><small>DESTINATION</small><strong id="end-label">Choose on map</strong></span></button>
+</div>
+<div class="route-actions"><button id="use-location" class="secondary-action" type="button">◎ Use my location as start</button><button id="route-button" class="primary-action" type="button">Find driving route <span aria-hidden="true">↗</span></button></div>
+<div id="route-summary" class="route-summary" aria-live="polite"></div>
+</div>
+<div class="view" data-panel="saved" hidden>
+<p class="eyebrow">YOUR COLLECTION</p><h1>Places worth<br><em>keeping close.</em></h1>
+<p class="lead">Saved places stay in this browser, not in a GoreeCloud account.</p>
+<div id="saved-list" class="results" aria-live="polite"></div>
+</div>
+<div class="view" data-panel="privacy" hidden>
+<p class="eyebrow">BUILT WITH INTENTION</p><h1>Your location.<br><em>Your decision.</em></h1>
+<p class="lead">No account, analytics, ads, or automatic device-location requests in this preview.</p>
+<div class="privacy-list">
+<div><strong>Map tile requests</strong><p>Loading the map contacts the selected tile provider. It can observe your IP and the map area you view.</p></div>
+<div><strong>Place search & routing</strong><p>When configured, your search or selected coordinates go through this server to the selected search or routing provider. Never submit sensitive places to an untrusted provider.</p></div>
+<div><strong>Saved places</strong><p>Saved locally in this browser. They are not encrypted; anyone with access to this browser profile may see them.</p></div>
+<div><strong>Device location</strong><p>Requested only when you press “Use my location” and your browser grants permission.</p></div>
+</div>
+<button id="clear-saved" class="danger-action" type="button">Erase saved places on this device</button>
+<button id="reload-tiles" class="secondary-action" type="button">Review map network consent</button>
+</div>
+</div>
+<p class="sidebar-footer">GoreeCloud Maps <span>·</span> Open geographic foundations <span>·</span> v0.1 preview</p>
+</section>
+<section class="map-area" aria-label="Interactive map">
+<div id="map" role="application" aria-label="Interactive geographic map"></div>
+<div id="map-consent" class="map-consent">
+<div class="consent-card">
+<div class="hero-symbol" aria-hidden="true">◇</div>
+<p class="eyebrow">THE WORLD, ON YOUR TERMS</p>
+<h2>Explore with clarity.</h2>
+<p>Maps use external map tiles. The tile provider receives your IP address and the geographic area you view. No location permission is requested automatically.</p>
+<button id="load-map" class="primary-action" type="button">Load interactive map <span aria-hidden="true">↗</span></button>
+<a href="https://www.openstreetmap.org/copyright" rel="noopener noreferrer" target="_blank">About OpenStreetMap data and attribution</a>
+</div>
+</div>
+<div class="map-topline"><span class="map-live-dot" aria-hidden="true"></span><span id="map-mode">Map not loaded</span></div>
+<div class="map-controls" aria-label="Map controls">
+<button id="zoom-in" class="map-control" type="button" aria-label="Zoom in" disabled>+</button>
+<button id="zoom-out" class="map-control" type="button" aria-label="Zoom out" disabled>−</button>
+<button id="reset-view" class="map-control" type="button" aria-label="Show world view" disabled>⌖</button>
+</div>
+<div class="map-bottom"><span id="map-coordinates">40°N · 96°W</span><span id="status" role="status" aria-live="polite">Choose “Load interactive map” to begin.</span></div>
+</section>
+</main>
+</div>
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>
