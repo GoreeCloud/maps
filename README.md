@@ -5,7 +5,7 @@ Privacy-first maps and navigation **development preview**. This repository is an
 ## What is available in this preview
 
 - Responsive MapLibre-based interactive map with OpenStreetMap raster tiles after explicit user consent; the renderer's JavaScript is loaded lazily only when requested.
-- Explicit, permission-based browser geolocation; select points by clicking the map.
+- Explicit, permission-based browser geolocation, scoped to the current map-consent session. Revoking map consent ignores delayed location results and clears device-derived route starts; manual start selection overrides pending GPS. This is synthetic browser-tested behavior, not physical-device acceptance. Select points by clicking the map.
 - Local longitude,latitude coordinate lookup without any geocoding provider request.
 - Local-only saved places, browser-only preference, and erase-all control.
 - Saved-place GeoJSON import/export and local **GPX 1.1 waypoint export** (not GPX import or route-track export), with bounded saved points, XML-safe names and duplicate-aware GeoJSON merging; accessible start/end coordinate entry.

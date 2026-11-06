@@ -9,7 +9,7 @@ All items below are **planned**, not current product capabilities.
 - Connect authorized own-hosted map tiles, Nominatim and OSRM; verify service capacity, data freshness, licensing, alerts and observability.
 - Complete the approved GoreeCloud UI **component/layout** adoption, accessible visual QA and five-platform MIPS assessment; scoped stable Foundations color/typography token integration has begun, but is not full design-system acceptance.
 - Trusted HTTPS gateway, request budgets, structured privacy-safe errors and operations runbook.
-- Profile map renderer performance and network consumption on real mobile devices; synthetic CI checks that the map code bundle is not fetched before the consent action.
+- Finish the browser-only geolocation consent-epoch regression in PR #18, then verify actual browser/device permission timing, cancellation boundaries, and no stale route starts. Profile renderer performance and network consumption on real mobile devices; synthetic CI already checks that the map code bundle is not fetched before explicit consent.
 
 ## P1 — Useful travel features
 - Richer geocoding, reverse geocoding, POI details, saved route plans, **GPX waypoint import and route-track interchange** (waypoint export is already implemented), and richer GeoJSON geometry compatibility.
