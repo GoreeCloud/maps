@@ -164,6 +164,8 @@ async function loadMap() {
     if (token !== state.mapRequestId) return;
     state.engine = engine;
     state.map = new engine.Map({container: 'map', style: mapStyle(), center: WORLD_CENTER, zoom: 3.6, attributionControl: true, maxZoom: 19});
+    el('map').classList.add('live');
+    el('map-preview-note').hidden = true;
     state.map.on('click', (event) => selectPoint([event.lngLat.lng, event.lngLat.lat], 'Pinned location'));
     state.map.on('moveend', () => {
       el('map-coordinates').textContent = formatPoint([state.map.getCenter().lng, state.map.getCenter().lat]);
@@ -176,6 +178,8 @@ async function loadMap() {
   } catch {
     if (token === state.mapRequestId) {
       state.map?.remove(); state.map = null;
+      el('map').classList.remove('live');
+      el('map-preview-note').hidden = false;
       status('Unable to start map rendering on this device.');
     }
   } finally {
@@ -205,6 +209,8 @@ el('reload-tiles').addEventListener('click', () => {
   }
   invalidateRoute();
   state.map?.remove(); state.map = null;
+  el('map').classList.remove('live');
+  el('map-preview-note').hidden = false;
   state.markerStart = null; state.markerEnd = null;
   el('map-consent').hidden = false;
   el('map-mode').textContent = 'Map not loaded';
@@ -436,6 +442,8 @@ el('route-button').addEventListener('click', async () => {
 
 el('search-form').addEventListener('submit', async (event) => {
   event.preventDefault();
+  // Search lives above the map, but its accessible results live in Explore.
+  if (document.querySelector('[data-panel="explore"]').hidden) chooseView('explore');
   const query = el('search-input').value.trim();
   const directPoint = parsePoint(query);
   if (directPoint) {
