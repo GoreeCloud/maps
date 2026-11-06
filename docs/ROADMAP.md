@@ -11,7 +11,7 @@ All items below are **planned**, not current product capabilities.
 - Trusted HTTPS gateway, request budgets, structured privacy-safe errors and operations runbook.
 
 ## P1 — Useful travel features
-- Richer geocoding, reverse geocoding, POI details, saved route plans and GPX/GeoJSON import/export.
+- Richer geocoding, reverse geocoding, POI details, saved route plans, GPX, and richer GeoJSON geometry compatibility.
 - Walking and cycling profiles, route alternatives, estimated arrival times and route instruction steps.
 - EV routing, charging station connectors and local transit data integration.
 - Progressive web app installability, offline-first UI shell and compliant self-hosted offline tiles.

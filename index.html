@@ -46,12 +46,26 @@
 <div class="route-divider" aria-hidden="true"></div>
 <button id="choose-end" class="point-button" type="button"><span class="point-icon destination" aria-hidden="true">●</span><span><small>DESTINATION</small><strong id="end-label">Choose on map</strong></span></button>
 </div>
+<div class="coordinate-entry" aria-label="Manual route coordinates">
+<p class="coordinate-help">Or enter coordinates without using the map or device location.</p>
+<label for="start-coordinates">Start longitude, latitude</label>
+<input id="start-coordinates" type="text" autocomplete="off" inputmode="decimal" placeholder="-86.801,33.518" maxlength="60">
+<label for="end-coordinates">Destination longitude, latitude</label>
+<input id="end-coordinates" type="text" autocomplete="off" inputmode="decimal" placeholder="-87.000,33.800" maxlength="60">
+<button id="apply-route-coordinates" class="secondary-action" type="button">Apply coordinate points</button>
+</div>
 <div class="route-actions"><button id="use-location" class="secondary-action" type="button">◎ Use my location as start</button><button id="route-button" class="primary-action" type="button">Find driving route <span aria-hidden="true">↗</span></button></div>
 <div id="route-summary" class="route-summary" aria-live="polite"></div>
 </div>
 <div class="view" data-panel="saved" hidden>
 <p class="eyebrow">YOUR COLLECTION</p><h1>Places worth<br><em>keeping close.</em></h1>
 <p class="lead">Saved places stay in this browser, not in a GoreeCloud account.</p>
+<div class="saved-tools">
+<button id="export-places" class="secondary-action" type="button">Export GeoJSON</button>
+<button id="import-places-button" class="secondary-action" type="button">Import GeoJSON</button>
+<input id="import-places" class="sr-only" type="file" accept=".geojson,.json,application/geo+json,application/json" aria-label="Choose a GeoJSON file of saved places">
+</div>
+<p class="help">Portable local backups. Imported places never leave this browser.</p>
 <div id="saved-list" class="results" aria-live="polite"></div>
 </div>
 <div class="view" data-panel="privacy" hidden>

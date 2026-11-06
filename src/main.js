@@ -3,6 +3,7 @@ import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './style.css';
 import { WORLD_CENTER, validPoint, parsePoint, formatPoint, cleanLabel, readSaved, formatDuration, formatDistance } from './lib/geo.js';
+import { exportSavedGeoJSON, importSavedGeoJSON, mergeSavedPlaces, MAX_IMPORT_BYTES } from './lib/geojson.js';
 
 setWorkerUrl(workerUrl);
 const el = (id) => document.getElementById(id);
@@ -151,6 +152,7 @@ el('save-selection').addEventListener('click', () => {
 
 function renderSaved() {
   const list = el('saved-list'); list.replaceChildren();
+  el('export-places').disabled = state.saved.length === 0;
   if (!state.saved.length) {
     const empty = document.createElement('p'); empty.className = 'empty-message';
     empty.textContent = 'Nothing saved yet. Choose a point on the map, then save it.';
@@ -172,6 +174,43 @@ function renderSaved() {
     row.append(button, remove); list.append(row);
   });
 }
+el('export-places').addEventListener('click', () => {
+  if (!state.saved.length) return;
+  try {
+    const data = exportSavedGeoJSON(state.saved);
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/geo+json'});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'goreecloud-maps-saved-places.geojson';
+    document.body.append(link);
+    try { link.click(); } finally { link.remove(); }
+    setTimeout(() => URL.revokeObjectURL(url), 3000);
+    status('Saved-place backup created locally. Keep this file private.');
+  } catch (error) {
+    status(error.message || 'Could not export saved places.');
+  }
+});
+el('import-places-button').addEventListener('click', () => el('import-places').click());
+el('import-places').addEventListener('change', async (event) => {
+  const file = event.target.files?.[0];
+  event.target.value = '';
+  if (!file) return;
+  if (file.size > MAX_IMPORT_BYTES) { status('Choose a GeoJSON file smaller than 128 KiB.'); return; }
+  try {
+    const imported = importSavedGeoJSON(await file.text());
+    const combined = mergeSavedPlaces(state.saved, imported);
+    const additions = combined.length - state.saved.length;
+    if (!additions) { status('No new places to import.'); return; }
+    if (!window.confirm(`Import ${additions} new saved place(s) into this browser? Existing places will remain.`)) return;
+    if (!safeStore.set(SAVE_KEY, JSON.stringify(combined))) throw new Error('Browser storage unavailable. Import not saved.');
+    state.saved = combined;
+    renderSaved();
+    status(`Imported ${additions} new place(s) locally. No upload performed.`);
+  } catch (error) {
+    status(error.message || 'Unable to import GeoJSON.');
+  }
+});
 el('clear-saved').addEventListener('click', () => {
   if (!state.saved.length) { status('No saved places to erase.'); return; }
   if (!window.confirm('Erase all saved GoreeCloud Maps places from this browser?')) return;
@@ -179,6 +218,24 @@ el('clear-saved').addEventListener('click', () => {
   status('Saved places erased from this browser.');
 });
 
+el('apply-route-coordinates').addEventListener('click', () => {
+  const start = parsePoint(el('start-coordinates').value);
+  const end = parsePoint(el('end-coordinates').value);
+  if (!start || !end) { status('Enter valid longitude,latitude coordinates for both points.'); return; }
+  if (start[0] === end[0] && start[1] === end[1]) { status('Start and destination must differ.'); return; }
+  state.start = start;
+  state.end = end;
+  el('start-label').textContent = formatPoint(start);
+  el('end-label').textContent = formatPoint(end);
+  if (state.map) {
+    setMarker('start', start);
+    setMarker('end', end);
+    const source = state.map.getSource('goree-route');
+    if (source) source.setData({type:'FeatureCollection',features:[]});
+  }
+  el('route-summary').textContent = 'Points set. Find driving route to calculate a new route.';
+  status('Start and destination set locally, without device location.');
+});
 el('choose-start').addEventListener('click', () => { state.pick = 'start'; status('Tap the map to choose your starting point.'); });
 el('choose-end').addEventListener('click', () => { state.pick = 'end'; status('Tap the map to choose your destination.'); });
 el('use-location').addEventListener('click', () => {
