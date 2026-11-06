@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1000" viewBox="0 0 1440 1000" role="img" aria-label="Illustrative, non-geographic street map preview">
+<defs>
+  <pattern id="blocks" width="112" height="112" patternUnits="userSpaceOnUse" patternTransform="rotate(-10)">
+    <rect width="112" height="112" fill="#e7ece9"/>
+    <path d="M0 1H112 M1 0V112" stroke="#d1dad7" stroke-width="3" fill="none"/>
+    <path d="M43 0V112 M82 0V112 M0 39H112 M0 82H112" stroke="#eef2ef" stroke-width="12"/>
+  </pattern>
+  <linearGradient id="water" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#a6d6d9"/><stop offset="1" stop-color="#7cbdc8"/></linearGradient>
+  <linearGradient id="park" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b9dec0"/><stop offset="1" stop-color="#a2d3b7"/></linearGradient>
+  <filter id="soft"><feGaussianBlur stdDeviation="10"/></filter>
+</defs>
+<rect width="1440" height="1000" fill="url(#blocks)"/>
+<g opacity=".52" fill="#f5f4e8" stroke="#e0e4d5" stroke-width="3">
+  <rect x="190" y="110" width="135" height="92" rx="8" transform="rotate(-10 190 110)"/>
+  <rect x="1000" y="98" width="174" height="116" rx="8" transform="rotate(-10 1000 98)"/>
+  <rect x="710" y="590" width="148" height="120" rx="8" transform="rotate(-10 710 590)"/>
+  <rect x="390" y="770" width="198" height="118" rx="8" transform="rotate(-10 390 770)"/>
+</g>
+<path d="M-90 485 C90 410 190 482 335 390 S565 290 725 335 S1000 465 1162 331 S1364 143 1535 205 L1540 500 C1360 420 1260 512 1170 574 S930 707 755 620 S545 497 376 572 S75 670 -90 614 Z" fill="#90cbd3" stroke="#e4faf2" stroke-width="7"/>
+<path d="M-90 514 C90 442 191 512 335 423 S567 326 725 369 S992 498 1165 363 S1363 177 1535 238" stroke="url(#water)" stroke-width="115" fill="none" stroke-linecap="round"/>
+<path d="M-90 514 C90 442 191 512 335 423 S567 326 725 369 S992 498 1165 363 S1363 177 1535 238" stroke="#c8edef" stroke-width="3" stroke-opacity=".72" fill="none"/>
+<g fill="url(#park)" stroke="#a1c9aa" stroke-width="5">
+  <path d="M-50 35 L245 -30 360 140 288 320 80 310 -70 198Z"/>
+  <path d="M900 655 L1064 548 1278 638 1390 810 1315 1020 1068 997 936 807Z"/>
+  <path d="M535 720 L655 687 724 805 676 945 530 965 472 835Z"/>
+  <path d="M1160 60 L1290 20 1448 79 1490 185 1360 298 1220 240Z"/>
+</g>
+<g stroke="#81b89a" stroke-width="3" opacity=".7" fill="none">
+  <path d="M12 110Q123 186 240 85M22 214Q170 259 280 188M965 764Q1080 710 1216 784M1030 878Q1169 835 1354 920"/>
+</g>
+<!-- Street underlays and wide, readable main roads -->
+<g stroke="#c9cfd3" stroke-width="40" stroke-linecap="round" stroke-linejoin="round" fill="none">
+  <path d="M-70 835 C340 700 602 598 839 566 S1230 514 1530 580"/>
+  <path d="M410 -80 C477 170 524 360 602 503 S770 825 812 1090"/>
+  <path d="M925 -70 C900 220 901 365 998 530 S1080 830 1120 1080"/>
+  <path d="M-70 170 C320 290 625 170 840 92 S1320 90 1510 33"/>
+</g>
+<g stroke="#fdfcf8" stroke-width="32" stroke-linecap="round" stroke-linejoin="round" fill="none">
+  <path d="M-70 835 C340 700 602 598 839 566 S1230 514 1530 580"/>
+  <path d="M410 -80 C477 170 524 360 602 503 S770 825 812 1090"/>
+  <path d="M925 -70 C900 220 901 365 998 530 S1080 830 1120 1080"/>
+  <path d="M-70 170 C320 290 625 170 840 92 S1320 90 1510 33"/>
+</g>
+<g stroke="#cdd8d4" stroke-width="13" fill="none" stroke-linecap="round">
+  <path d="M60 -40 L152 1090 M320 -60L417 1050 M660 -20L730 1110 M1250 -40L1300 1090"/>
+  <path d="M-50 347L1480 293 M-30 690L1480 722 M-40 915L1480 900"/>
+</g>
+<g stroke="#ffffff" stroke-width="9" fill="none" stroke-linecap="round">
+  <path d="M60 -40 L152 1090 M320 -60L417 1050 M660 -20L730 1110 M1250 -40L1300 1090"/>
+  <path d="M-50 347L1480 293 M-30 690L1480 722 M-40 915L1480 900"/>
+</g>
+<!-- Walking path and wayfinding route -->
+<path d="M240 705 Q360 680 500 617 T800 554 Q946 516 1090 515" fill="none" stroke="#fff" stroke-width="16" opacity=".85" stroke-linecap="round"/>
+<path d="M240 705 Q360 680 500 617 T800 554 Q946 516 1090 515" fill="none" stroke="#4767e1" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(240 705)">
+  <circle r="25" fill="#fff" opacity=".8"/>
+  <circle r="15" fill="#4869e6" stroke="#fff" stroke-width="5"/>
+</g>
+<g transform="translate(1090 515)">
+  <ellipse cy="12" rx="19" ry="8" fill="#1c4970" opacity=".16"/>
+  <path d="M0 19C12 4 21 -7 21 -19a21 21 0 0 0 -42 0C-21 -7 -12 4 0 19Z" fill="#4869e6" stroke="white" stroke-width="5"/>
+  <circle cy="-19" r="7" fill="#fff"/>
+</g>
+<g fill="#71928e" font-family="Arial,Helvetica,sans-serif" font-weight="700" letter-spacing="3" font-size="18" opacity=".85">
+  <text x="95" y="124">NORTH GARDENS</text>
+  <text x="1010" y="823">GREENWAY</text>
+  <text x="510" y="888">PARK DISTRICT</text>
+</g>
+<g fill="#5f7c86" font-family="Arial,Helvetica,sans-serif" letter-spacing="2" font-size="15">
+  <text x="422" y="250" transform="rotate(74 422 250)">RIVER AVENUE</text>
+  <text x="1196" y="628">CROSSING</text>
+  <text x="245" y="670">LOCAL ROUTE</text>
+</g>
+<g fill="#397c90" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="600" letter-spacing="2" opacity=".74">
+  <text x="560" y="425" transform="rotate(-12 560 425)">RIVER</text>
+</g>
+</svg>
