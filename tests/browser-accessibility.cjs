@@ -96,6 +96,15 @@ async function journey(browser, base, name, width, height, contrast) {
     // Selection card is in Explore and remains hidden while Routes is active.
     assert.match(await page.locator('#selection-card').textContent(), /Map center/);
     assert.equal(await page.locator('#pin-center').isEnabled(),true);
+    if (width <= 700) {
+      const positions = await page.evaluate(() => {
+        const label = document.querySelector('.map-topline').getBoundingClientRect();
+        const controls = document.querySelector('.map-controls').getBoundingClientRect();
+        return {labelRight:label.right,controlsLeft:controls.left};
+      });
+      assert.ok(positions.labelRight + 4 <= positions.controlsLeft,
+        'mobile map status label must not overlap map controls');
+    }
     await page.screenshot({path:resolve(evidence,name+'-map.png')});
 
     // The app must not create horizontal document scroll at the tested viewport.
