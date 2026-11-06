@@ -6,6 +6,7 @@ Privacy-first maps and navigation **development preview**. This repository is an
 
 - Responsive MapLibre-based interactive map with OpenStreetMap raster tiles after explicit user consent.
 - Explicit, permission-based browser geolocation; select points by clicking the map.
+- Local longitude,latitude coordinate lookup without any geocoding provider request.
 - Local-only saved places, browser-only preference, and erase-all control.
 - Optional place search through a configured Nominatim-compatible upstream and driving routes through a configured OSRM-compatible upstream.
 - Same-origin Node proxy that validates requests, bounds provider replies and does not persist search queries or route coordinates.
