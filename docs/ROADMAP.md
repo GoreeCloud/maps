@@ -4,7 +4,7 @@ All items below are **planned**, not current product capabilities.
 
 ## P0 — Validate foundation
 - Maintain the committed dependency lockfile and clean `npm ci` install checks, monitor dependency advisories, and complete broader third-party provenance, license and supply-chain review.
-- Extend the passing synthetic viewport/keyboard/forced-colors browser coverage to real phones/tablets, manual keyboard-only traversal, screen-reader testing and enlarged text/zoom, broader visual states, and comprehensive GoreeCloud UI design acceptance. Reviewed synthetic screenshots are scoped evidence, not production UI approval.
+- Build on passing synthetic viewport/keyboard/forced-colors and 320px/640px CSS reflow checks with real phones/tablets, actual 200–400% browser zoom, manual keyboard-only traversal, screen-reader testing, broader visual states, and comprehensive GoreeCloud UI design acceptance. Reviewed synthetic screenshots are scoped evidence, not production UI approval.
 - Extend implemented keyboard map-center pin tests to map navigation and keyboard-only point changes; verify real tile-provider attribution, cookie/privacy exposure, CSP and Referrer-Policy with licensed production infrastructure.
 - Connect authorized own-hosted map tiles, Nominatim and OSRM; verify service capacity, data freshness, licensing, alerts and observability.
 - Integrate approved GoreeCloud UI tokens/components and document five-platform MIPS assessment.
