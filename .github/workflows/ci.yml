@@ -14,6 +14,8 @@ jobs:
           node-version: '22'
       - name: Install exact direct dependencies
         run: npm install --no-audit --no-fund
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
       - name: Node tests
         run: npm test
       - name: Syntax checks
