@@ -1,19 +1,8 @@
 /* GC UI Foundations 1.0.1 (verified SHA-256 release archive): semantic token authority.
    No external runtime CSS/font requests; package is pinned with npm lock integrity. */
-@import "@goreecloud/gc-ui/css/tokens";
+@import "./gc-ui-tokens.css";
 :root {
-  /* Compatibility bridge: stable Foundations v1 is still the actual token
-     source. New GC UI --gc-* roles alias the same values without a palette shift. */
-  --gc-font-ui:var(--gc-v1-foundation-typography-family-ui);
-  --gc-canvas:var(--gc-v1-color-canvas);
-  --gc-surface:var(--gc-v1-color-surface);
-  --gc-surface-tonal:var(--gc-v1-color-surface-raised);
-  --gc-text:var(--gc-v1-color-on-surface);
-  --gc-text-soft:var(--gc-v1-color-on-surface-muted);
-  --gc-outline:var(--gc-v1-color-outline);
-  --gc-brand:var(--gc-v1-color-primary);
-  --gc-on-brand:var(--gc-v1-color-on-primary);
-  --gc-focus-ring:var(--gc-v1-color-focus-ring);
+  /* Current pinned GC UI alpha semantic roles; no external CSS fetch. */
   font-family:var(--gc-font-ui);
   color-scheme:dark;
   --canvas:var(--gc-canvas);
@@ -24,8 +13,8 @@
   --outline:var(--gc-outline);
   --primary:var(--gc-brand);
   --primary-on:var(--gc-on-brand);
-  --line:var(--gc-v1-color-divider);
-  --input:var(--gc-v1-color-surface-inset);
+  --line:var(--gc-outline-soft);
+  --input:var(--gc-surface-tonal);
   --focus:var(--gc-focus-ring);
   --elevation:0 18px 48px rgba(0,0,0,.22);
 }
@@ -229,7 +218,7 @@ h1 em{font-style:normal;color:var(--primary)}
 .map-area{isolation:isolate}
 .map-preview-note{
   position:absolute;z-index:2;top:106px;right:24px;pointer-events:none;
-  font:700 10px/1.4 var(--gc-v1-foundation-typography-family-ui);
+  font:700 10px/1.4 var(--gc-font-ui);
   letter-spacing:.04em;color:#43616b;background:rgba(255,255,255,.91);
   border:1px solid #c7d4d5;border-radius:999px;padding:7px 11px;
   box-shadow:0 5px 18px rgba(35,67,77,.1);
