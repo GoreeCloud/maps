@@ -37,16 +37,22 @@ async function journey(browser, base, name, width, height, contrast) {
       document.body.append(probe);
       const tokenColor=getComputedStyle(probe).backgroundColor;
       probe.remove();
-      return {mode:root.dataset.gcMode,accent:root.dataset.gcAccent,
-        actual:getComputedStyle(document.body).backgroundColor,token:tokenColor};
+      return {mode:root.dataset.gcMode,theme:root.dataset.gcTheme,accent:root.dataset.gcAccent,
+        actual:getComputedStyle(document.body).backgroundColor,token:tokenColor,
+        semantic:getComputedStyle(root).getPropertyValue("--gc-canvas").trim(),
+        bridge:getComputedStyle(root).getPropertyValue("--gc-v1-color-canvas").trim()};
     });
     let colors=await gcColors();
     assert.equal(colors.mode,'dark');
+    assert.equal(colors.theme,colors.mode);
+    assert.equal(colors.semantic,colors.bridge);
     assert.equal(colors.accent,'lagoon');
     assert.equal(colors.actual,colors.token,'dark mode must consume GC UI canvas tokens');
     await page.locator('#theme-toggle').click();
     const light=await gcColors();
     assert.equal(light.mode,'light');
+    assert.equal(light.theme,light.mode);
+    assert.equal(light.semantic,light.bridge);
     assert.equal(light.actual,light.token,'light mode must consume GC UI canvas tokens');
     // In forced-colors, Chromium intentionally substitutes system Canvas colors,
     // so the rendered colors need not differ even when the chosen theme changes.
