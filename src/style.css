@@ -1,20 +1,21 @@
-/* GC UI Foundations 1.0.1 (verified SHA-256 release archive): semantic token authority.
-   No external runtime CSS/font requests; package is pinned with npm lock integrity. */
-@import "@goreecloud/gc-ui/css/tokens";
+/* GC UI alpha semantic tokens from exact, locally pinned MIT source blob.
+   No external runtime CSS, font requests or missing-release tarball dependency. */
+@import "./gc-ui-tokens.css";
 :root {
-  font-family:var(--gc-v1-foundation-typography-family-ui);
+  /* Current pinned GC UI alpha semantic roles; no external CSS fetch. */
+  font-family:var(--gc-font-ui);
   color-scheme:dark;
-  --canvas:var(--gc-v1-color-canvas);
-  --surface:var(--gc-v1-color-surface);
-  --surface-raised:var(--gc-v1-color-surface-raised);
-  --on:var(--gc-v1-color-on-surface);
-  --muted:var(--gc-v1-color-on-surface-muted);
-  --outline:var(--gc-v1-color-outline);
-  --primary:var(--gc-v1-color-primary);
-  --primary-on:var(--gc-v1-color-on-primary);
-  --line:var(--gc-v1-color-divider);
-  --input:var(--gc-v1-color-surface-inset);
-  --focus:var(--gc-v1-color-focus-ring);
+  --canvas:var(--gc-canvas);
+  --surface:var(--gc-surface);
+  --surface-raised:var(--gc-surface-tonal);
+  --on:var(--gc-text);
+  --muted:var(--gc-text-soft);
+  --outline:var(--gc-outline);
+  --primary:var(--gc-brand);
+  --primary-on:var(--gc-on-brand);
+  --line:var(--gc-outline-soft);
+  --input:var(--gc-surface-tonal);
+  --focus:var(--gc-focus-ring);
   --elevation:0 18px 48px rgba(0,0,0,.22);
 }
 :root[data-theme="light"] {
@@ -217,7 +218,7 @@ h1 em{font-style:normal;color:var(--primary)}
 .map-area{isolation:isolate}
 .map-preview-note{
   position:absolute;z-index:2;top:106px;right:24px;pointer-events:none;
-  font:700 10px/1.4 var(--gc-v1-foundation-typography-family-ui);
+  font:700 10px/1.4 var(--gc-font-ui);
   letter-spacing:.04em;color:#43616b;background:rgba(255,255,255,.91);
   border:1px solid #c7d4d5;border-radius:999px;padding:7px 11px;
   box-shadow:0 5px 18px rgba(35,67,77,.1);
