@@ -1,5 +1,5 @@
-/* GC UI Foundations 1.0.1 (verified SHA-256 release archive): semantic token authority.
-   No external runtime CSS/font requests; package is pinned with npm lock integrity. */
+/* GC UI alpha semantic tokens from exact, locally pinned MIT source blob.
+   No external runtime CSS, font requests or missing-release tarball dependency. */
 @import "./gc-ui-tokens.css";
 :root {
   /* Current pinned GC UI alpha semantic roles; no external CSS fetch. */
