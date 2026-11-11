@@ -69,10 +69,12 @@ document.querySelectorAll('[data-view]').forEach((button) => button.addEventList
 const initialTheme = safeStore.get(THEME_KEY) === 'light' ? 'light' : 'dark';
 document.documentElement.dataset.theme = initialTheme;
 document.documentElement.dataset.gcMode = initialTheme;
+document.documentElement.dataset.gcTheme = initialTheme;
 el('theme-toggle').addEventListener('click', () => {
   const value = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
   document.documentElement.dataset.theme = value;
   document.documentElement.dataset.gcMode = value;
+  document.documentElement.dataset.gcTheme = value;
   safeStore.set(THEME_KEY, value);
 });
 
